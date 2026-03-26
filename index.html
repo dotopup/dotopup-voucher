@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WIFI CIWATIN - Voucher WiFi Instant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .gradient-bg { background: linear-gradient(to bottom, #ecfdf5, white, #ecfeff); }
+    .gradient-btn { background: linear-gradient(to right, #10b981, #06b6d4); }
+    .gradient-btn:hover { background: linear-gradient(to right, #059669, #0891b2); }
+    .card-hover:hover { border-color: #10b981; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    .modal { backdrop-filter: blur(4px); }
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen flex flex-col">
+
+  <!-- ==================== KONFIGURASI ==================== -->
+  <!-- Edit bagian ini sesuai kebutuhan toko kamu -->
+  <script>
+    const CONFIG = {
+      namaToko: "WIFI CIWATIN",
+      noWhatsappAdmin: "6281224940172",
+      alamat: "Jl. Ciwatin Raya, Indonesia",
+      
+      // QRIS Dinamis - untuk checkout lebih dari 1 paket
+      // Upload ke Google Drive, lalu ganti FILE_ID
+      qrisDinamis: "https://drive.google.com/uc?export=view&id=YOUR_DYNAMIC_QRIS_ID",
+      
+      // Daftar paket WiFi - sesuaikan dengan kebutuhan
+      // Ganti YOUR_FILE_ID_X dengan ID file Google Drive masing-masing QRIS
+      paket: [
+        {
+          id: "1",
+          nama: "Paket 2 Jam",
+          durasi: "2 Jam",
+          harga: 1000,
+          kecepatan: "Up to 10 Mbps",
+          deskripsi: "Cocok untuk browsing singkat",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_1"
+        },
+        {
+          id: "2",
+          nama: "Paket 6 Jam",
+          durasi: "6 Jam",
+          harga: 2000,
+          kecepatan: "Up to 10 Mbps",
+          deskripsi: "Ideal untuk streaming",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_2"
+        },
+        {
+          id: "3",
+          nama: "Paket 12 Jam",
+          durasi: "12 Jam",
+          harga: 3000,
+          kecepatan: "Up to 15 Mbps",
+          deskripsi: "Sempurna untuk work from home",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_3"
+        },
+        {
+          id: "4",
+          nama: "Paket 1 Hari",
+          durasi: "1 Hari (24 Jam)",
+          harga: 5000,
+          kecepatan: "Up to 15 Mbps",
+          deskripsi: "Full day internet",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_4"
+        },
+        {
+          id: "5",
+          nama: "Paket 3 Hari",
+          durasi: "3 Hari",
+          harga: 10000,
+          kecepatan: "Up to 20 Mbps",
+          deskripsi: "Paket mingguan hemat",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_5"
+        },
+        {
+          id: "6",
+          nama: "Paket 1 Minggu",
+          durasi: "7 Hari",
+          harga: 12000,
+          kecepatan: "Up to 20 Mbps",
+          deskripsi: "Weekly premium access",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_6"
+        },
+        {
+          id: "7",
+          nama: "Paket 2 Minggu",
+          durasi: "14 Hari",
+          harga: 13000,
+          kecepatan: "Up to 25 Mbps",
+          deskripsi: "Two weeks full access",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_7"
+        },
+        {
+          id: "8",
+          nama: "Paket 1 Bulan",
+          durasi: "30 Hari",
+          harga: 25000,
+          kecepatan: "Up to 30 Mbps",
+          deskripsi: "Monthly unlimited",
+          qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_8"
+        }
+      ]
+    };
+  </script>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b shadow-sm">
+    <div class="container mx-auto px-3 sm:px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-btn flex items-center justify-center shadow-lg">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg text-gray-900" id="storeName">WIFI CIWATIN</h1>
+          <p class="text-xs text-gray-500 hidden sm:block">Internet Cepat & Terjangkau</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openHistoryModal()" class="flex items-center gap-1 sm:gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="hidden sm:inline text-sm">Pesanan</span>
+        </button>
+        <button onclick="openCartModal()" class="relative gradient-btn text-white px-3 py-2 rounded-lg flex items-center gap-1 sm:gap-2 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <span class="hidden sm:inline text-sm">Keranjang</span>
+          <span id="cartBadge" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="py-6 sm:py-10 px-3 sm:px-4">
+    <div class="container mx-auto text-center">
+      <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm mb-3 sm:mb-4">
+        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+        Koneksi Super Cepat
+      </div>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 px-2">
+        Voucher WiFi Instant
+      </h2>
+      <p class="text-gray-600 max-w-md mx-auto text-sm sm:text-base px-4">
+        Pilih paket sesuai kebutuhan, bayar via QRIS, dan dapatkan kode voucher dalam hitungan menit!
+      </p>
+    </div>
+  </section>
+
+  <!-- Package Grid -->
+  <main class="flex-1 px-3 sm:px-4 pb-24 sm:pb-8">
+    <div class="container mx-auto">
+      <div id="packageGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+        <!-- Packages will be rendered here by JavaScript -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating Cart Button (Mobile) -->
+  <div id="floatingCart" class="fixed bottom-4 left-4 right-4 sm:hidden z-40 hidden">
+    <button onclick="openCartModal()" class="w-full gradient-btn text-white h-12 rounded-xl shadow-lg flex items-center justify-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+      </svg>
+      <span>Lihat Keranjang (<span id="floatingCartCount">0</span>) - <span id="floatingCartTotal">Rp 0</span></span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-6 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-xl gradient-btn flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+          </svg>
+        </div>
+        <span class="font-semibold" id="footerStoreName">WIFI CIWATIN</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3" id="footerAddress">Jl. Ciwatin Raya, Indonesia</p>
+      <div class="flex items-center justify-center gap-2 text-sm">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <a id="whatsappLink" href="#" target="_blank" rel="noopener" class="text-emerald-400 hover:text-emerald-300">Hubungi Admin</a>
+      </div>
+      <p class="text-gray-500 text-xs mt-4" id="copyright"></p>
+    </div>
+  </footer>
+
+  <!-- Cart Modal -->
+  <div id="cartModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 modal" onclick="closeCartModal()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            Keranjang Belanja
+          </h3>
+          <button onclick="closeCartModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <p id="cartDescription" class="text-sm text-gray-500 mb-4">0 item dalam keranjang</p>
+        
+        <div id="cartItems" class="space-y-3 mb-4 max-h-64 overflow-y-auto">
+          <!-- Cart items will be rendered here -->
+        </div>
+        
+        <div id="cartEmpty" class="py-8 text-center text-gray-500 hidden">
+          <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <p>Keranjang masih kosong</p>
+          <p class="text-sm">Tambahkan paket untuk melanjutkan</p>
+        </div>
+        
+        <div id="cartSummary" class="border-t pt-4 space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold">Total</span>
+            <span id="cartTotal" class="text-xl font-bold text-emerald-600">Rp 0</span>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="clearCart()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Hapus
+            </button>
+            <button onclick="proceedToCheckout()" class="flex-1 gradient-btn text-white px-4 py-2 rounded-lg transition">
+              Checkout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 modal" onclick="closeCheckoutModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="checkoutTitle" class="text-lg font-bold">Checkout</h3>
+          <button onclick="closeCheckoutModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <p id="checkoutDescription" class="text-sm text-gray-500 mb-4">0 item - Total: Rp 0</p>
+        
+        <!-- Step 1: Form -->
+        <div id="checkoutStep1" class="space-y-4">
+          <div id="orderSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 max-h-32 overflow-y-auto text-sm">
+            <!-- Order summary -->
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Nama Lengkap</label>
+            <input type="text" id="inputNama" placeholder="Masukkan nama lengkap" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Nomor WhatsApp</label>
+            <input type="tel" id="inputWhatsapp" placeholder="Contoh: 08123456789" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <p class="text-xs text-gray-500 mt-1">Untuk menerima kode voucher</p>
+          </div>
+          <button onclick="submitCheckout()" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+            </svg>
+            Lanjut ke Pembayaran
+          </button>
+        </div>
+        
+        <!-- Step 2: Payment -->
+        <div id="checkoutStep2" class="space-y-4 hidden">
+          <div class="bg-blue-50 rounded-lg p-3 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-500">ID Pesanan</p>
+              <p id="orderIdDisplay" class="font-mono font-semibold text-sm">WFI-XXX</p>
+            </div>
+            <button onclick="copyOrderId()" class="p-2 hover:bg-blue-100 rounded-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div id="qrisInfo" class="text-center"></div>
+          
+          <div class="flex justify-center">
+            <div class="bg-white p-3 rounded-xl shadow-lg border">
+              <img id="qrisImage" src="" alt="QRIS Payment" class="w-56 h-56 sm:w-64 sm:h-64 object-contain">
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-lg font-bold text-emerald-600">
+              Transfer: <span id="paymentTotal">Rp 0</span>
+            </p>
+          </div>
+          
+          <button onclick="confirmPayment()" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Saya Sudah Bayar
+          </button>
+        </div>
+        
+        <!-- Step 3: WhatsApp -->
+        <div id="checkoutStep3" class="space-y-4 hidden">
+          <div class="bg-green-50 rounded-lg p-4 text-center">
+            <svg class="w-12 h-12 mx-auto text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="font-semibold text-green-700">Pembayaran Dikonfirmasi!</p>
+            <p class="text-sm text-gray-600 mt-1">Kirim bukti pembayaran ke admin untuk mendapatkan kode voucher</p>
+          </div>
+          
+          <div id="finalOrderSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 text-sm">
+            <!-- Final summary -->
+          </div>
+          
+          <button onclick="sendWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            </svg>
+            Kirim ke WhatsApp Admin
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </button>
+          
+          <p class="text-xs text-center text-gray-500">
+            Kode voucher akan dikirim oleh admin setelah verifikasi
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div id="historyModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 modal" onclick="closeHistoryModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Riwayat Pesanan
+          </h3>
+          <button onclick="closeHistoryModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-gray-500 mb-4">Masukkan nomor WhatsApp untuk melihat pesanan</p>
+        
+        <div class="flex gap-2 mb-4">
+          <input type="tel" id="historyPhone" placeholder="Nomor WhatsApp (08xxx)" class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <button onclick="loadHistory()" class="px-4 py-2 gradient-btn text-white rounded-lg">Cari</button>
+        </div>
+        
+        <div id="historyList" class="space-y-3 max-h-96 overflow-y-auto">
+          <!-- History items will be rendered here -->
+        </div>
+        
+        <div id="historyEmpty" class="py-8 text-center text-gray-500">
+          <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+          </svg>
+          <p>Masukkan nomor WhatsApp untuk melihat pesanan</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-20 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 z-50">
+    <p id="toastMessage">Message</p>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // ==================== STATE ====================
+    let cart = [];
+    let currentOrder = null;
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    }
+
+    function generateOrderId() {
+      const timestamp = Date.now().toString(36).toUpperCase();
+      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return `WFI-${timestamp}-${random}`;
+    }
+
+    function getStorageKey(phone) {
+      return `wifi_orders_${phone.replace(/\D/g, '')}`;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = message;
+      toast.classList.remove('translate-y-full', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-full', 'opacity-0');
+      }, 3000);
+    }
+
+    function formatDate(timestamp) {
+      return new Date(timestamp).toLocaleString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function cleanExpiredOrders(phone) {
+      const key = getStorageKey(phone);
+      const stored = localStorage.getItem(key);
+      if (!stored) return [];
+      
+      try {
+        const orders = JSON.parse(stored);
+        const now = Date.now();
+        const validOrders = orders.filter(order => order.expiresAt > now);
+        
+        if (validOrders.length !== orders.length) {
+          localStorage.setItem(key, JSON.stringify(validOrders));
+        }
+        
+        return validOrders;
+      } catch {
+        return [];
+      }
+    }
+
+    // ==================== INITIALIZATION ====================
+    function init() {
+      // Set store name and info
+      document.getElementById('storeName').textContent = CONFIG.namaToko;
+      document.getElementById('footerStoreName').textContent = CONFIG.namaToko;
+      document.getElementById('footerAddress').textContent = CONFIG.alamat;
+      document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${CONFIG.namaToko}. All rights reserved.`;
+      document.getElementById('whatsappLink').href = `https://wa.me/${CONFIG.noWhatsappAdmin}`;
+      
+      // Load cart from localStorage
+      const savedCart = localStorage.getItem('wifi_cart');
+      if (savedCart) {
+        try {
+          cart = JSON.parse(savedCart);
+        } catch {
+          cart = [];
+        }
+      }
+      
+      // Render packages
+      renderPackages();
+      updateCartUI();
+    }
+
+    function renderPackages() {
+      const grid = document.getElementById('packageGrid');
+      grid.innerHTML = CONFIG.paket.map((paket, index) => `
+        <div class="relative overflow-hidden border-2 border-transparent card-hover rounded-xl bg-white transition-all duration-300 group ${index >= 4 ? 'bg-gradient-to-b from-amber-50 to-white' : ''}">
+          ${index >= 4 ? `
+            <div class="absolute top-0 right-0">
+              <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs px-2 py-1 rounded-bl-lg rounded-tr-lg">Best Value</span>
+            </div>
+          ` : ''}
+          <div class="p-3 sm:p-4">
+            <div class="flex items-center gap-2 sm:gap-3 mb-3">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-btn flex items-center justify-center shadow group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-lg leading-tight">${paket.nama}</h3>
+                <p class="text-xs text-gray-500 flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  ${paket.kecepatan}
+                </p>
+              </div>
+            </div>
+            <div class="text-center mb-3">
+              <p class="text-xl sm:text-2xl font-bold text-emerald-600">${formatRupiah(paket.harga)}</p>
+              <p class="text-xs sm:text-sm text-gray-500">untuk ${paket.durasi}</p>
+            </div>
+            <p class="text-xs text-gray-500 text-center hidden sm:block mb-3">${paket.deskripsi}</p>
+            <button onclick="addToCart('${paket.id}')" class="w-full gradient-btn text-white py-2 rounded-lg text-sm flex items-center justify-center gap-1 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Tambah
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==================== CART FUNCTIONS ====================
+    function addToCart(paketId) {
+      const paket = CONFIG.paket.find(p => p.id === paketId);
+      if (!paket) return;
+      
+      const existing = cart.find(item => item.id === paketId);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        cart.push({ ...paket, quantity: 1 });
+      }
+      
+      saveCart();
+      updateCartUI();
+      showToast(`${paket.nama} ditambahkan ke keranjang`);
+    }
+
+    function removeFromCart(paketId) {
+      cart = cart.filter(item => item.id !== paketId);
+      saveCart();
+      updateCartUI();
+      renderCartItems();
+    }
+
+    function updateQuantity(paketId, delta) {
+      const item = cart.find(i => i.id === paketId);
+      if (item) {
+        item.quantity += delta;
+        if (item.quantity <= 0) {
+          removeFromCart(paketId);
+          return;
+        }
+        saveCart();
+        updateCartUI();
+        renderCartItems();
+      }
+    }
+
+    function clearCart() {
+      cart = [];
+      saveCart();
+      updateCartUI();
+      renderCartItems();
+      showToast('Keranjang dikosongkan');
+    }
+
+    function saveCart() {
+      localStorage.setItem('wifi_cart', JSON.stringify(cart));
+    }
+
+    function updateCartUI() {
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const total = cart.reduce((sum, item) => sum + item.harga * item.quantity, 0);
+      
+      // Update badge
+      const badge = document.getElementById('cartBadge');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+      
+      // Update floating cart
+      const floatingCart = document.getElementById('floatingCart');
+      if (count > 0) {
+        floatingCart.classList.remove('hidden');
+        document.getElementById('floatingCartCount').textContent = count;
+        document.getElementById('floatingCartTotal').textContent = formatRupiah(total);
+      } else {
+        floatingCart.classList.add('hidden');
+      }
+      
+      // Update cart description
+      document.getElementById('cartDescription').textContent = count > 0 ? `${count} item dalam keranjang` : 'Keranjang masih kosong';
+      document.getElementById('cartTotal').textContent = formatRupiah(total);
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cartItems');
+      const emptyState = document.getElementById('cartEmpty');
+      const summary = document.getElementById('cartSummary');
+      
+      if (cart.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        summary.classList.add('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      summary.classList.remove('hidden');
+      
+      container.innerHTML = cart.map(item => `
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <div class="w-10 h-10 rounded-lg gradient-btn flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-sm truncate">${item.nama}</p>
+            <p class="text-xs text-gray-500">${formatRupiah(item.harga)}</p>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="updateQuantity('${item.id}', -1)" class="w-7 h-7 border rounded flex items-center justify-center hover:bg-gray-100">−</button>
+            <span class="w-8 text-center text-sm font-medium">${item.quantity}</span>
+            <button onclick="updateQuantity('${item.id}', 1)" class="w-7 h-7 border rounded flex items-center justify-center hover:bg-gray-100">+</button>
+          </div>
+          <button onclick="removeFromCart('${item.id}')" class="w-8 h-8 text-red-500 hover:bg-red-50 rounded flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // ==================== MODAL FUNCTIONS ====================
+    function openCartModal() {
+      document.getElementById('cartModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      renderCartItems();
+    }
+
+    function closeCartModal() {
+      document.getElementById('cartModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function openCheckoutModal() {
+      document.getElementById('checkoutModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.add('hidden');
+      document.body.style.overflow = '';
+      // Reset checkout
+      showCheckoutStep(1);
+      document.getElementById('inputNama').value = '';
+      document.getElementById('inputWhatsapp').value = '';
+      currentOrder = null;
+    }
+
+    function openHistoryModal() {
+      document.getElementById('historyModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('historyList').innerHTML = '';
+      document.getElementById('historyEmpty').classList.remove('hidden');
+      document.getElementById('historyPhone').value = '';
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ==================== CHECKOUT FUNCTIONS ====================
+    function proceedToCheckout() {
+      if (cart.length === 0) {
+        showToast('Keranjang kosong');
+        return;
+      }
+      
+      closeCartModal();
+      openCheckoutModal();
+      showCheckoutStep(1);
+      
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const total = cart.reduce((sum, item) => sum + item.harga * item.quantity, 0);
+      
+      document.getElementById('checkoutDescription').textContent = `${count} item - Total: ${formatRupiah(total)}`;
+      document.getElementById('orderSummary').innerHTML = cart.map(item => `
+        <div class="flex justify-between">
+          <span>${item.nama} x${item.quantity}</span>
+          <span class="font-medium">${formatRupiah(item.harga * item.quantity)}</span>
+        </div>
+      `).join('') + `<div class="border-t pt-2 mt-2 flex justify-between font-semibold"><span>Total</span><span class="text-emerald-600">${formatRupiah(total)}</span></div>`;
+    }
+
+    function showCheckoutStep(step) {
+      document.getElementById('checkoutStep1').classList.toggle('hidden', step !== 1);
+      document.getElementById('checkoutStep2').classList.toggle('hidden', step !== 2);
+      document.getElementById('checkoutStep3').classList.toggle('hidden', step !== 3);
+      
+      const titles = ['Checkout', 'Pembayaran QRIS', 'Konfirmasi ke Admin'];
+      document.getElementById('checkoutTitle').textContent = titles[step - 1];
+    }
+
+    function submitCheckout() {
+      const nama = document.getElementById('inputNama').value.trim();
+      const whatsapp = document.getElementById('inputWhatsapp').value.trim();
+      
+      if (!nama || !whatsapp) {
+        showToast('Mohon lengkapi semua data');
+        return;
+      }
+      
+      const cleanNumber = whatsapp.replace(/\D/g, '');
+      if (cleanNumber.length < 10 || cleanNumber.length > 15) {
+        showToast('Nomor WhatsApp tidak valid');
+        return;
+      }
+      
+      const formattedNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
+      const total = cart.reduce((sum, item) => sum + item.harga * item.quantity, 0);
+      
+      const now = Date.now();
+      const twoDaysInMs = 2 * 24 * 60 * 60 * 1000;
+      
+      currentOrder = {
+        id: generateOrderId(),
+        items: cart.map(item => ({
+          paketId: item.id,
+          nama: item.nama,
+          harga: item.harga,
+          quantity: item.quantity
+        })),
+        total: total,
+        namaPembeli: nama,
+        noWhatsapp: formattedNumber,
+        status: 'pending',
+        createdAt: now,
+        expiresAt: now + twoDaysInMs
+      };
+      
+      // Save order
+      const key = getStorageKey(formattedNumber);
+      const existingOrders = cleanExpiredOrders(formattedNumber);
+      existingOrders.unshift(currentOrder);
+      localStorage.setItem(key, JSON.stringify(existingOrders));
+      
+      // Show payment step
+      showCheckoutStep(2);
+      document.getElementById('orderIdDisplay').textContent = currentOrder.id;
+      document.getElementById('paymentTotal').textContent = formatRupiah(total);
+      
+      // Determine QRIS type
+      if (currentOrder.items.length === 1) {
+        const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0].paketId);
+        document.getElementById('qrisImage').src = paket?.qrisImage || CONFIG.qrisDinamis;
+        document.getElementById('qrisInfo').innerHTML = `
+          <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mb-2">QRIS dengan Nominal Tetap</span>
+          <p class="text-sm text-gray-600">Scan QRIS berikut - nominal sudah sesuai</p>
+        `;
+      } else {
+        document.getElementById('qrisImage').src = CONFIG.qrisDinamis;
+        document.getElementById('qrisInfo').innerHTML = `
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+            <strong>QRIS Dinamis:</strong> Scan QRIS berikut dan masukkan nominal <strong>${formatRupiah(total)}</strong> secara manual
+          </div>
+        `;
+      }
+      
+      showToast('Pesanan berhasil dibuat!');
+    }
+
+    function copyOrderId() {
+      if (!currentOrder) return;
+      navigator.clipboard.writeText(currentOrder.id);
+      showToast('ID Pesanan berhasil disalin');
+    }
+
+    function confirmPayment() {
+      if (!currentOrder) return;
+      
+      // Update order status
+      const key = getStorageKey(currentOrder.noWhatsapp);
+      const orders = cleanExpiredOrders(currentOrder.noWhatsapp);
+      const updatedOrders = orders.map(o => o.id === currentOrder.id ? { ...o, status: 'paid' } : o);
+      localStorage.setItem(key, JSON.stringify(updatedOrders));
+      
+      currentOrder.status = 'paid';
+      showCheckoutStep(3);
+      
+      // Show final summary
+      document.getElementById('finalOrderSummary').innerHTML = `
+        <div class="flex justify-between">
+          <span class="text-gray-500">ID Pesanan</span>
+          <span class="font-mono font-semibold">${currentOrder.id}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">Item</span>
+          <span>${currentOrder.items.length} paket</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">Total</span>
+          <span class="font-semibold text-emerald-600">${formatRupiah(currentOrder.total)}</span>
+        </div>
+      `;
+      
+      // Clear cart
+      cart = [];
+      saveCart();
+      updateCartUI();
+      
+      showToast('Silakan hubungi admin via WhatsApp');
+    }
+
+    function sendWhatsApp() {
+      if (!currentOrder) return;
+      
+      const itemsText = currentOrder.items.map(item => 
+        `• ${item.nama} x${item.quantity} = ${formatRupiah(item.harga * item.quantity)}`
+      ).join('\n');
+      
+      const message = encodeURIComponent(
+        `Halo Admin ${CONFIG.namaToko}!\n\n` +
+        `Saya sudah melakukan pembayaran untuk pesanan:\n\n` +
+        `🆔 ID Pesanan: ${currentOrder.id}\n\n` +
+        `📦 Detail Pesanan:\n${itemsText}\n\n` +
+        `💰 Total: ${formatRupiah(currentOrder.total)}\n\n` +
+        `👤 Nama: ${currentOrder.namaPembeli}\n` +
+        `📱 No. HP: ${currentOrder.noWhatsapp}\n\n` +
+        `Mohon dikirimkan kode voucher. Terima kasih! 🙏`
+      );
+      
+      window.open(`https://wa.me/${CONFIG.noWhatsappAdmin}?text=${message}`, '_blank');
+    }
+
+    // ==================== HISTORY FUNCTIONS ====================
+    function loadHistory() {
+      const phone = document.getElementById('historyPhone').value.trim();
+      const cleanNumber = phone.replace(/\D/g, '');
+      
+      if (cleanNumber.length < 10) {
+        showToast('Nomor tidak valid');
+        return;
+      }
+      
+      const formattedNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
+      const orders = cleanExpiredOrders(formattedNumber);
+      
+      const container = document.getElementById('historyList');
+      const emptyState = document.getElementById('historyEmpty');
+      
+      if (orders.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        showToast('Tidak ada pesanan ditemukan');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      container.innerHTML = orders.map(order => {
+        const statusBadge = order.status === 'pending' 
+          ? '<span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">Menunggu Pembayaran</span>'
+          : order.status === 'paid'
+          ? '<span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded">Menunggu Konfirmasi</span>'
+          : '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Selesai</span>';
+        
+        const itemsHtml = order.items.map(item => `
+          <div class="flex justify-between">
+            <span>${item.nama} x${item.quantity}</span>
+            <span>${formatRupiah(item.harga * item.quantity)}</span>
+          </div>
+        `).join('');
+        
+        const contactBtn = order.status === 'paid' ? `
+          <button onclick="contactAdmin('${order.id}')" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg text-sm mt-2 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            Hubungi Admin
+          </button>
+        ` : '';
+        
+        return `
+          <div class="border rounded-lg p-3 space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm font-semibold">${order.id}</span>
+                <button onclick="navigator.clipboard.writeText('${order.id}'); showToast('ID disalin')" class="p-1 hover:bg-gray-100 rounded">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                  </svg>
+                </button>
+              </div>
+              ${statusBadge}
+            </div>
+            <p class="text-xs text-gray-500">${formatDate(order.createdAt)}</p>
+            <div class="text-sm space-y-1">${itemsHtml}</div>
+            <div class="border-t pt-2 flex justify-between font-semibold">
+              <span>Total</span>
+              <span class="text-emerald-600">${formatRupiah(order.total)}</span>
+            </div>
+            ${contactBtn}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function contactAdmin(orderId) {
+      const phone = document.getElementById('historyPhone').value.trim();
+      const cleanNumber = phone.replace(/\D/g, '');
+      const formattedNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
+      const orders = cleanExpiredOrders(formattedNumber);
+      const order = orders.find(o => o.id === orderId);
+      
+      if (!order) return;
+      
+      const itemsText = order.items.map(item => 
+        `• ${item.nama} x${item.quantity} = ${formatRupiah(item.harga * item.quantity)}`
+      ).join('\n');
+      
+      const message = encodeURIComponent(
+        `Halo Admin ${CONFIG.namaToko}!\n\n` +
+        `Saya ingin menanyakan pesanan:\n\n` +
+        `🆔 ID Pesanan: ${order.id}\n\n` +
+        `📦 Detail:\n${itemsText}\n\n` +
+        `💰 Total: ${formatRupiah(order.total)}\n\n` +
+        `Terima kasih! 🙏`
+      );
+      
+      window.open(`https://wa.me/${CONFIG.noWhatsappAdmin}?text=${message}`, '_blank');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
