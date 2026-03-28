@@ -70,27 +70,6 @@
     .dropdown-item:hover { background: #f5f5f5; }
     .dropdown-item svg { width: 20px; height: 20px; color: #6b7280; flex-shrink: 0; }
     
-    .confirm-order-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 14px 24px;
-      border-radius: 50px;
-      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
-      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-      cursor: pointer;
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s ease;
-      color: white;
-      font-weight: 600;
-      font-size: 14px;
-      border: none;
-    }
-    .confirm-order-btn:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); }
-    
     .upload-method-btn {
       flex: 1;
       display: flex;
@@ -170,6 +149,117 @@
       height: 28px;
       color: #10b981;
     }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+    
+    .btn-loading .btn-text {
+      visibility: hidden;
+    }
+    
+    .btn-loading .btn-spinner {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    /* Progress bar animation */
+    .progress-bar-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: white;
+      border-radius: 2px;
+      animation: progress 5s linear forwards;
+    }
+    
+    @keyframes progress {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+    
+    /* Confirm Order Button - Centered Style */
+    .confirm-order-section {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .confirm-order-card {
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    
+    .confirm-order-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+    
+    .confirm-order-card .icon-wrapper {
+      width: 48px;
+      height: 48px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .confirm-order-card .icon-wrapper svg {
+      width: 26px;
+      height: 26px;
+      color: #10b981;
+    }
+    
+    .confirm-order-card .text-content {
+      color: white;
+    }
+    
+    .confirm-order-card .text-content .title {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+    
+    .confirm-order-card .text-content .subtitle {
+      font-size: 12px;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body class="gradient-bg min-h-screen flex flex-col">
@@ -197,14 +287,14 @@
       },
       
       paket: [
-        { id: "1", nama: "Paket 2 Jam", durasi: "2 Jam", harga: 1000, kecepatan: "Unlimited", kategori: "cepat" },
-        { id: "2", nama: "Paket 5 Jam", durasi: "5 Jam", harga: 2000, kecepatan: "Unlimited", kategori: "cepat" },
-        { id: "3", nama: "Paket 12 Jam", durasi: "12 Jam", harga: 3000, kecepatan: "Unlimited", kategori: "cepat" },
-        { id: "4", nama: "Paket 1 Hari", durasi: "24 Jam", harga: 4000, kecepatan: "Unlimited", kategori: "harian", bestSeller: true },
-        { id: "5", nama: "Paket 2 Hari", durasi: "2 Hari", harga: 5000, kecepatan: "Unlimited", kategori: "harian" },
-        { id: "6", nama: "Paket 3 Hari", durasi: "3 Hari", harga: 7000, kecepatan: "Unlimited", kategori: "harian" },
-        { id: "7", nama: "Paket 6 Hari", durasi: "6 Hari", harga: 13000, kecepatan: "Unlimited", kategori: "mingguan" },
-        { id: "8", nama: "Paket 1 Bulan", durasi: "1 Bulan", harga: 100000, kecepatan: "Unlimited", kategori: "rumah" }
+        { id: "1", nama: "Paket 2 Jam", durasi: "2 Jam", harga: 1000, kecepatan: "1 Device", kategori: "cepat" },
+        { id: "2", nama: "Paket 5 Jam", durasi: "5 Jam", harga: 2000, kecepatan: "1 Device", kategori: "cepat" },
+        { id: "3", nama: "Paket 12 Jam", durasi: "12 Jam", harga: 3000, kecepatan: "1 Device", kategori: "cepat" },
+        { id: "4", nama: "Paket 1 Hari", durasi: "24 Jam", harga: 4000, kecepatan: "1 Device", kategori: "harian", bestSeller: true },
+        { id: "5", nama: "Paket 2 Hari", durasi: "2 Hari", harga: 5000, kecepatan: "1 Device", kategori: "harian" },
+        { id: "6", nama: "Paket 3 Hari", durasi: "3 Hari", harga: 7000, kecepatan: "1 Device", kategori: "harian" },
+        { id: "7", nama: "Paket 6 Hari", durasi: "6 Hari", harga: 13000, kecepatan: "1 Device", kategori: "mingguan" },
+        { id: "8", nama: "Paket 1 Bulan", durasi: "1 Bulan", harga: 100000, kecepatan: "Multi Device", kategori: "rumah" }
       ]
     };
   </script>
@@ -247,10 +337,6 @@
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               <span>Join Jualan Voucher</span>
             </div>
-            <div id="menuInstallApp" class="dropdown-item">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-              <span>Install Aplikasi</span>
-            </div>
           </div>
         </div>
         
@@ -280,7 +366,7 @@
   </section>
 
   <!-- Package Categories -->
-  <main class="flex-1 px-3 sm:px-4 pb-24 sm:pb-8">
+  <main class="flex-1 px-3 sm:px-4 pb-8">
     <div class="container mx-auto">
       
       <!-- Install App Banner -->
@@ -301,7 +387,21 @@
         <span class="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">🔹 Paket Mingguan</span>
         <span class="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">🏠 Paket Internet Rumah</span>
       </div>
+      
       <div id="packageGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"></div>
+      
+      <!-- Confirm Order Section - Centered -->
+      <div class="confirm-order-section">
+        <div id="confirmOrderBtn" class="confirm-order-card" title="Konfirmasi Pesanan">
+          <div class="icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="text-content">
+            <p class="title">Konfirmasi Pesanan</p>
+            <p class="subtitle">Upload bukti pembayaran di sini</p>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -339,12 +439,6 @@
     </div>
   </footer>
 
-  <!-- ==================== KONFIRMASI PESANAN BUTTON ==================== -->
-  <button id="confirmOrderBtn" class="confirm-order-btn" title="Konfirmasi Pesanan">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-    Konfirmasi Pesanan
-  </button>
-  
   <!-- ==================== MODAL KONFIRMASI PESANAN ==================== -->
   <div id="confirmOrderModal" class="fixed inset-0 z-50 is-hidden">
     <div class="modal-overlay absolute inset-0" id="confirmOrderOverlay"></div>
@@ -669,7 +763,16 @@
             <p class="text-red-700 text-sm">⚠️ Gagal memuat QRIS. <button onclick="retryQris()" class="underline text-blue-600">Coba lagi</button></p>
           </div>
           <div class="text-center"><p class="text-lg font-bold text-emerald-600">Transfer: <span id="paymentTotal">Rp 0</span></p></div>
-          <button id="btnConfirmPayment" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2 pulse-glow">✅ Saya Sudah Bayar</button>
+          <button id="btnConfirmPayment" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2 pulse-glow">
+            <span class="btn-text">✅ Saya Sudah Bayar</span>
+            <span class="btn-spinner is-hidden"><div class="loading-spinner"></div></span>
+          </button>
+          <div id="paymentProgressContainer" class="is-hidden">
+            <p id="paymentProgressText" class="text-center text-sm text-gray-600 mb-1">Memproses pembayaran...</p>
+            <div class="progress-bar-container">
+              <div id="paymentProgressBar" class="progress-bar"></div>
+            </div>
+          </div>
         </div>
         
         <!-- Step 3: Upload Bukti -->
@@ -741,6 +844,18 @@
 
     function formatDate(ts) {
       return new Date(ts).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatDateLong(ts) {
+      return new Date(ts).toLocaleString('id-ID', { 
+        weekday: 'long',
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit',
+        timeZoneName: 'short'
+      });
     }
 
     function cleanExpiredOrders(phone) {
@@ -998,7 +1113,7 @@
       
       const formatted = clean.startsWith('0') ? '62' + clean.slice(1) : clean;
       let total = 0;
-      const items = cart.map(i => { total += i.harga * i.quantity; return { paketId: i.id, nama: i.nama, harga: i.harga, quantity: i.quantity }; });
+      const items = cart.map(i => { total += i.harga * i.quantity; return { paketId: i.id, nama: i.nama, harga: i.harga, durasi: i.durasi, kecepatan: i.kecepatan, quantity: i.quantity }; });
       
       currentOrder = { id: generateOrderId(), items, total, noWhatsapp: formatted, status: 'pending', createdAt: Date.now(), expiresAt: Date.now() + 2*24*60*60*1000 };
       
@@ -1054,23 +1169,62 @@
 
     function confirmPayment() {
       if (!currentOrder) return;
-      const key = getStorageKey(currentOrder.noWhatsapp);
-      const orders = cleanExpiredOrders(currentOrder.noWhatsapp);
-      orders.forEach(o => { if (o.id === currentOrder.id) o.status = 'paid'; });
-      safeLocalStorage('set', key, orders);
-      currentOrder.status = 'paid';
-      currentCheckoutStep = 3;
-      showCheckoutStep(3);
       
-      document.getElementById('finalOrderSummary').innerHTML = `
-        <div class="flex justify-between"><span class="text-gray-500">ID Pesanan</span><span class="font-mono font-semibold">${currentOrder.id}</span></div>
-        <div class="flex justify-between"><span class="text-gray-500">Item</span><span>${currentOrder.items.length} paket</span></div>
-        <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-semibold text-emerald-600">${formatRupiah(currentOrder.total)}</span></div>
-      `;
+      const btn = document.getElementById('btnConfirmPayment');
+      const btnText = btn.querySelector('.btn-text');
+      const btnSpinner = btn.querySelector('.btn-spinner');
+      const progressContainer = document.getElementById('paymentProgressContainer');
+      const progressText = document.getElementById('paymentProgressText');
       
-      cart = [];
-      saveCart();
-      updateCartUI();
+      // Show loading state
+      btn.classList.add('btn-loading');
+      btnText.classList.add('is-hidden');
+      btnSpinner.classList.remove('is-hidden');
+      progressContainer.classList.remove('is-hidden');
+      
+      // Countdown timer
+      let secondsLeft = 5;
+      progressText.textContent = `Memverifikasi pembayaran... ${secondsLeft} detik`;
+      
+      const countdownInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          progressText.textContent = `Memverifikasi pembayaran... ${secondsLeft} detik`;
+        } else {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+      
+      // Process after 5 seconds
+      setTimeout(() => {
+        // Update order status
+        const key = getStorageKey(currentOrder.noWhatsapp);
+        const orders = cleanExpiredOrders(currentOrder.noWhatsapp);
+        orders.forEach(o => { if (o.id === currentOrder.id) o.status = 'paid'; });
+        safeLocalStorage('set', key, orders);
+        currentOrder.status = 'paid';
+        currentCheckoutStep = 3;
+        showCheckoutStep(3);
+        
+        document.getElementById('finalOrderSummary').innerHTML = `
+          <div class="flex justify-between"><span class="text-gray-500">ID Pesanan</span><span class="font-mono font-semibold">${currentOrder.id}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Item</span><span>${currentOrder.items.length} paket</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-semibold text-emerald-600">${formatRupiah(currentOrder.total)}</span></div>
+        `;
+        
+        // Reset button state
+        btn.classList.remove('btn-loading');
+        btnText.classList.remove('is-hidden');
+        btnSpinner.classList.add('is-hidden');
+        progressContainer.classList.add('is-hidden');
+        
+        // Clear cart
+        cart = [];
+        saveCart();
+        updateCartUI();
+        
+        showToast('✅ Pembayaran berhasil dikonfirmasi!');
+      }, 5000);
     }
 
     function loadHistory() {
@@ -1195,19 +1349,64 @@
       return null;
     }
     
-    // Fungsi untuk format detail paket
-    function formatPackageDetails(order) {
-      if (!order || !order.items || order.items.length === 0) return '';
-      let details = '📦 <b>Detail Pesanan:</b>\n';
-      details += '─────────────────\n';
-      order.items.forEach((item, idx) => {
-        const subtotal = item.harga * item.quantity;
-        details += `${idx + 1}. ${item.nama}\n`;
-        details += `   ${item.quantity}x ${formatRupiah(item.harga)} = ${formatRupiah(subtotal)}\n`;
-      });
-      details += '─────────────────\n';
-      details += `💰 <b>Total: ${formatRupiah(order.total)}</b>\n`;
-      return details;
+    // Fungsi untuk format pesan Telegram seperti struk
+    function formatTelegramReceipt(order, phone, message, type = 'confirmation') {
+      const msgTime = Date.now();
+      
+      // Header
+      let receipt = `═══════════════════════════════\n`;
+      receipt += `        <b>🛒 ${CONFIG.namaToko}</b>\n`;
+      receipt += `═══════════════════════════════\n\n`;
+      
+      // Tipe pesan
+      if (type === 'confirmation') {
+        receipt += `📥 <b>KONFIRMASI PESANAN</b>\n`;
+        receipt += `────────────────────────────────\n`;
+      }
+      
+      // Info Pesanan
+      receipt += `🆔 <b>ID Pesanan:</b> <code>${order?.id || 'Tidak ada ID'}</code>\n`;
+      receipt += `📱 <b>No. WhatsApp:</b> ${phone}\n`;
+      receipt += `🕐 <b>Waktu:</b> ${formatDateLong(msgTime)}\n`;
+      
+      // Detail Item jika ada
+      if (order && order.items && order.items.length > 0) {
+        receipt += `\n┌──────────────────────────────┐\n`;
+        receipt += `│       <b>📦 DETAIL PESANAN</b>       │\n`;
+        receipt += `├──────────────────────────────┤\n`;
+        
+        order.items.forEach((item, idx) => {
+          const subtotal = item.harga * item.quantity;
+          receipt += `│ <b>${idx + 1}. ${item.nama}</b>\n`;
+          receipt += `│    Durasi: ${item.durasi}\n`;
+          receipt += `│    ${item.kecepatan}\n`;
+          receipt += `│    ${item.quantity}x ${formatRupiah(item.harga)} = ${formatRupiah(subtotal)}\n`;
+          if (idx < order.items.length - 1) {
+            receipt += `│──────────────────────────────│\n`;
+          }
+        });
+        
+        receipt += `├──────────────────────────────┤\n`;
+        receipt += `│ <b>TOTAL: ${formatRupiah(order.total)}</b>`;
+        const spaces = 28 - (`TOTAL: ${formatRupiah(order.total)}`.length);
+        receipt += ' '.repeat(Math.max(0, spaces)) + `│\n`;
+        receipt += `└──────────────────────────────┘\n`;
+      }
+      
+      // Pesan tambahan
+      if (message) {
+        receipt += `\n💬 <b>Pesan:</b>\n${message}\n`;
+      }
+      
+      // Footer
+      receipt += `\n────────────────────────────────\n`;
+      receipt += `📍 <b>${CONFIG.namaToko}</b>\n`;
+      receipt += `📍 ${CONFIG.alamat}\n`;
+      receipt += `═══════════════════════════════\n`;
+      receipt += `       Terima kasih! 🙏\n`;
+      receipt += `═══════════════════════════════`;
+      
+      return receipt;
     }
 
     async function submitConfirmation() {
@@ -1224,19 +1423,8 @@
       // Cari data pesanan berdasarkan ID
       const orderData = findOrderById(orderId);
       
-      const msgTime = Date.now();
-      let telegramMessage = `✅ <b>KONFIRMASI PESANAN</b>\n\n`;
-      telegramMessage += `📱 <b>No. WhatsApp:</b> ${phone}\n`;
-      if (orderId) telegramMessage += `🆔 <b>ID Pesanan:</b> <code>${orderId}</code>\n`;
-      telegramMessage += `🕐 <b>Waktu:</b> ${formatDate(msgTime)}\n`;
-      
-      // Tambahkan detail paket jika ada data pesanan
-      if (orderData) {
-        telegramMessage += `\n${formatPackageDetails(orderData)}`;
-      }
-      
-      if (message) telegramMessage += `\n💬 <b>Pesan:</b>\n${message}\n`;
-      telegramMessage += `\n───\n📍 ${CONFIG.namaToko}`;
+      // Format pesan seperti struk
+      const telegramMessage = formatTelegramReceipt(orderData, phone, message, 'confirmation');
       
       showToast('Mengirim konfirmasi...');
       
@@ -1279,7 +1467,6 @@
       document.getElementById('menuKritikSaran').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openKritikSaranModal(); });
       document.getElementById('menuInfoOffline').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openInfoOfflineModal(); });
       document.getElementById('menuJoinJualan').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openJoinJualanModal(); });
-      document.getElementById('menuInstallApp').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openInstallAppModal(); });
       
       document.getElementById('caraOrderOverlay').addEventListener('click', closeCaraOrderModal);
       document.getElementById('kritikSaranOverlay').addEventListener('click', closeKritikSaranModal);
