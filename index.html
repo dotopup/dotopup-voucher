@@ -137,8 +137,6 @@
     }
     
     .image-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 8px; }
-    .quick-msg-btn { padding: 8px 12px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 8px; font-size: 12px; color: #0369a1; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .quick-msg-btn:hover { background: #bae6fd; }
     
     /* Install App Banner */
     .install-banner {
@@ -172,36 +170,6 @@
       height: 28px;
       color: #10b981;
     }
-    
-    /* App Store Buttons */
-    .app-store-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 14px 20px;
-      background: #000;
-      color: white;
-      border-radius: 12px;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-    .app-store-btn:hover {
-      background: #333;
-      transform: translateY(-2px);
-    }
-    .app-store-btn.play-store {
-      background: linear-gradient(135deg, #34a853 0%, #4285f4 100%);
-    }
-    .app-store-btn.play-store:hover {
-      background: linear-gradient(135deg, #2d9248 0%, #3b7de0 100%);
-    }
-    .app-store-btn.apk {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    }
-    .app-store-btn.apk:hover {
-      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-    }
   </style>
 </head>
 <body class="gradient-bg min-h-screen flex flex-col">
@@ -216,7 +184,7 @@
       telegramBotToken: "8658739721:AAFCGFXDWukO8psp-n4wKZFY99HFKiFB3V0",
       telegramChatId: "1616582272",
       
-      // QRIS Images per nominal (gunakan format lh3.googleusercontent.com)
+      // QRIS Images per nominal
       qrisImages: {
         1000: "https://lh3.googleusercontent.com/d/1LW9iabbZ2vw8F6nuVYm8l8-UlBCPQmf6=w1000",
         2000: "https://lh3.googleusercontent.com/d/1ctOlUttmK4Z4T6vj1zEC894LD8Cs-Tl-=w1000",
@@ -496,7 +464,7 @@
         <p class="text-sm text-gray-600 mb-4">Kritik dan saran Anda sangat berharga untuk meningkatkan layanan kami.</p>
         <button id="btnOpenChatForSaran" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-          Kirim via Live Chat
+          Kirim via Konfirmasi
         </button>
       </div>
     </div>
@@ -576,14 +544,14 @@
           <p class="text-sm text-gray-600 mt-2">Pasang aplikasi di HP Anda untuk akses lebih cepat!</p>
         </div>
         
-        <!-- PWA Install Button (shown when available) -->
+        <!-- PWA Install Button -->
         <button id="pwaInstallBtn" class="w-full gradient-btn text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-3 mb-4 is-hidden">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           Install Sekarang
         </button>
         
         <!-- Manual Install Instructions -->
-        <div id="manualInstallInstructions" class="bg-gray-50 rounded-xl p-4">
+        <div class="bg-gray-50 rounded-xl p-4">
           <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
             <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Cara Manual Install
@@ -594,18 +562,18 @@
             <p class="text-sm font-medium text-gray-700 mb-2">📱 Android (Chrome):</p>
             <ol class="text-sm text-gray-600 space-y-1 ml-4 list-decimal">
               <li>Ketuk titik tiga (⋮) di pojok kanan atas</li>
-              <li>Pilih <strong>"Add to Home screen"</strong> atau <strong>"Tambahkan ke layar utama"</strong></li>
+              <li>Pilih <strong>"Add to Home screen"</strong></li>
               <li>Ketuk <strong>"Install"</strong></li>
             </ol>
           </div>
           
           <!-- Safari/iOS -->
-          <div class="mb-4">
+          <div>
             <p class="text-sm font-medium text-gray-700 mb-2">🍎 iPhone/iPad (Safari):</p>
             <ol class="text-sm text-gray-600 space-y-1 ml-4 list-decimal">
-              <li>Ketuk tombol Share <strong>(↑)</strong> di bawah</li>
+              <li>Ketuk tombol Share <strong>(↑)</strong></li>
               <li>Pilih <strong>"Add to Home Screen"</strong></li>
-              <li>Ketuk <strong>"Add"</strong> di pojok kanan atas</li>
+              <li>Ketuk <strong>"Add"</strong></li>
             </ol>
           </div>
         </div>
@@ -702,7 +670,7 @@
           <div id="finalOrderSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 text-sm"></div>
           <button id="btnOpenLiveChat" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-            📷 Upload Bukti di Live Chat
+            📷 Upload Bukti Pembayaran
           </button>
           <p class="text-xs text-center text-gray-500">Kode voucher akan dikirim ke WhatsApp setelah verifikasi</p>
         </div>
@@ -767,10 +735,6 @@
       return new Date(ts).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
-    function formatTime(ts) {
-      return new Date(ts).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    }
-
     function cleanExpiredOrders(phone) {
       try {
         const stored = localStorage.getItem(getStorageKey(phone));
@@ -813,18 +777,28 @@
       } catch (e) { return { ok: false, error: e.message }; }
     }
 
-    // Modal functions
-    function openCaraOrderModal() { document.getElementById('caraOrderModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; }
-    function closeCaraOrderModal() { document.getElementById('caraOrderModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    // ========== HELPER SHOW/HIDE TOMBOL KONFIRMASI ==========
+    function showConfirmBtn() { 
+      const btn = document.getElementById('confirmOrderBtn');
+      if (btn) btn.classList.remove('is-hidden'); 
+    }
+    function hideConfirmBtn() { 
+      const btn = document.getElementById('confirmOrderBtn');
+      if (btn) btn.classList.add('is-hidden'); 
+    }
+
+    // ========== MODAL FUNCTIONS ==========
+    function openCaraOrderModal() { document.getElementById('caraOrderModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeCaraOrderModal() { document.getElementById('caraOrderModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
     
-    function openKritikSaranModal() { document.getElementById('kritikSaranModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; }
-    function closeKritikSaranModal() { document.getElementById('kritikSaranModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    function openKritikSaranModal() { document.getElementById('kritikSaranModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeKritikSaranModal() { document.getElementById('kritikSaranModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
     
-    function openInfoOfflineModal() { document.getElementById('infoOfflineModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; }
-    function closeInfoOfflineModal() { document.getElementById('infoOfflineModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    function openInfoOfflineModal() { document.getElementById('infoOfflineModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeInfoOfflineModal() { document.getElementById('infoOfflineModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
     
-    function openJoinJualanModal() { document.getElementById('joinJualanModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; }
-    function closeJoinJualanModal() { document.getElementById('joinJualanModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    function openJoinJualanModal() { document.getElementById('joinJualanModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeJoinJualanModal() { document.getElementById('joinJualanModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
     
     // PWA Install
     let deferredPrompt = null;
@@ -832,11 +806,9 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      // Show install button in modal
       document.getElementById('pwaInstallBtn').classList.remove('is-hidden');
     });
     
-    // Hide banner when app is installed
     window.addEventListener('appinstalled', () => {
       deferredPrompt = null;
       document.getElementById('installBanner').classList.add('is-hidden');
@@ -844,7 +816,6 @@
       showToast('Aplikasi berhasil diinstall!');
     });
     
-    // Check if running as PWA
     function isRunningAsPWA() {
       return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     }
@@ -852,12 +823,11 @@
     function openInstallAppModal() { 
       document.getElementById('installAppModal').classList.remove('is-hidden'); 
       document.body.style.overflow = 'hidden';
+      hideConfirmBtn();
     }
-    function closeInstallAppModal() { document.getElementById('installAppModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    function closeInstallAppModal() { document.getElementById('installAppModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
     
-    // PWA Install Button Handler
     document.addEventListener('DOMContentLoaded', () => {
-      // Hide banner if already installed as PWA
       if (isRunningAsPWA()) {
         document.getElementById('installBanner').classList.add('is-hidden');
       }
@@ -869,47 +839,22 @@
         }
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          closeInstallAppModal();
-        }
+        if (outcome === 'accepted') closeInstallAppModal();
         deferredPrompt = null;
         document.getElementById('pwaInstallBtn').classList.add('is-hidden');
       });
     });
     
-    function openCartModal() { document.getElementById('cartModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; renderCartItems(); }
-    function closeCartModal() { document.getElementById('cartModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    function openCartModal() { document.getElementById('cartModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; renderCartItems(); hideConfirmBtn(); }
+    function closeCartModal() { document.getElementById('cartModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
     
-    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; }
-    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('is-hidden'); document.body.style.overflow = ''; currentCheckoutStep = 1; showCheckoutStep(1); }
+    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('is-hidden'); document.body.style.overflow = ''; currentCheckoutStep = 1; showCheckoutStep(1); showConfirmBtn(); }
     
-    function openHistoryModal() { document.getElementById('historyModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; document.getElementById('historyList').innerHTML = ''; }
-    function closeHistoryModal() { document.getElementById('historyModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    function openHistoryModal() { document.getElementById('historyModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; document.getElementById('historyList').innerHTML = ''; hideConfirmBtn(); }
+    function closeHistoryModal() { document.getElementById('historyModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
 
-    function handleImageSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (!file.type.startsWith('image/')) { showToast('Pilih file gambar'); return; }
-      if (file.size > 5 * 1024 * 1024) { showToast('Maksimal 5MB'); return; }
-      selectedImage = file;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        selectedImageBase64 = ev.target.result;
-        document.getElementById('imagePreview').src = selectedImageBase64;
-        document.getElementById('imagePreviewContainer').classList.remove('is-hidden');
-      };
-      reader.readAsDataURL(file);
-      showToast('Gambar dipilih');
-    }
-
-    function removeImage() {
-      selectedImage = null;
-      selectedImageBase64 = null;
-      document.getElementById('imagePreviewContainer').classList.add('is-hidden');
-      document.getElementById('imageInput').value = '';
-      document.getElementById('cameraInput').value = '';
-    }
-
+    // ========== RENDER PACKAGES ==========
     function renderPackages() {
       const grid = document.getElementById('packageGrid');
       grid.innerHTML = CONFIG.paket.map((p) => {
@@ -1059,63 +1004,35 @@
       document.getElementById('orderIdDisplay').textContent = currentOrder.id;
       document.getElementById('paymentTotal').textContent = formatRupiah(total);
       
-      // Get QRIS image based on total amount
       let qrisSrc = CONFIG.qrisDinamis;
       if (currentOrder.items.length === 1) {
         const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
         const harga = paket?.harga;
-        if (CONFIG.qrisImages[harga]) {
-          qrisSrc = CONFIG.qrisImages[harga];
-        }
+        if (CONFIG.qrisImages[harga]) qrisSrc = CONFIG.qrisImages[harga];
       }
       document.getElementById('qrisImage').src = qrisSrc;
       document.getElementById('qrisInfo').innerHTML = currentOrder.items.length === 1 
         ? '<span class="inline-block bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded mb-2">✓ QRIS Sesuai Nominal</span>'
         : `<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800"><strong>QRIS Dinamis:</strong> Masukkan nominal <strong>${formatRupiah(total)}</strong></div>`;
       
-      // Reset error state
       document.getElementById('qrisError').classList.add('is-hidden');
       document.getElementById('qrisImage').classList.remove('is-hidden');
     }
 
-      // QRIS Error handling with fallback
     function handleQrisError(img) {
-      console.log('QRIS image failed to load, trying fallback...');
-      const currentSrc = img.src;
-      
-      // Try alternative Google Drive formats
-      if (currentSrc.includes('lh3.googleusercontent.com')) {
-        // Try uc format
-        const fileId = currentSrc.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1];
-        if (fileId) {
-          img.src = `https://drive.google.com/uc?export=download&id=${fileId}`;
-          return;
-        }
-      } else if (currentSrc.includes('drive.google.com/uc')) {
-        // Try direct format
-        const fileId = currentSrc.match(/id=([a-zA-Z0-9_-]+)/)?.[1];
-        if (fileId) {
-          img.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-          return;
-        }
-      }
-      
-      // All fallbacks failed
+      console.log('QRIS image failed to load');
       img.classList.add('is-hidden');
       document.getElementById('qrisError').classList.remove('is-hidden');
     }
 
     function retryQris() {
-      const img = document.getElementById('qrisImage');
-      // Get fresh URL from config
       let qrisSrc = CONFIG.qrisDinamis;
       if (currentOrder && currentOrder.items.length === 1) {
         const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
         const harga = paket?.harga;
-        if (CONFIG.qrisImages[harga]) {
-          qrisSrc = CONFIG.qrisImages[harga];
-        }
+        if (CONFIG.qrisImages[harga]) qrisSrc = CONFIG.qrisImages[harga];
       }
+      const img = document.getElementById('qrisImage');
       img.src = qrisSrc + (qrisSrc.includes('?') ? '&' : '?') + 't=' + Date.now();
       img.classList.remove('is-hidden');
       document.getElementById('qrisError').classList.add('is-hidden');
@@ -1167,13 +1084,11 @@
       `).join('');
     }
 
-    // ==================== KONFIRMASI PESANAN ====================
-    
+    // ========== KONFIRMASI PESANAN ==========
     function openConfirmOrderModal() {
       document.getElementById('confirmOrderModal').classList.remove('is-hidden');
       document.body.style.overflow = 'hidden';
-      
-      // Pre-fill order ID if there's a current order
+      hideConfirmBtn();
       if (currentOrder) {
         document.getElementById('confirmOrderId').value = currentOrder.id;
         const savedUser = safeLocalStorage('get', 'wifi_chat_user');
@@ -1184,6 +1099,7 @@
     function closeConfirmOrderModal() {
       document.getElementById('confirmOrderModal').classList.add('is-hidden');
       document.body.style.overflow = '';
+      showConfirmBtn();
     }
     
     function handleConfirmImageSelect(e) {
@@ -1217,12 +1133,10 @@
       if (phone.replace(/\D/g, '').length < 10) { showToast('Nomor tidak valid'); return; }
       if (!confirmImageBase64) { showToast('Upload bukti pembayaran'); return; }
       
-      // Save phone for next time
       safeLocalStorage('set', 'wifi_chat_user', { phone });
       
       const msgTime = Date.now();
-      let telegramMessage = `✅ <b>KONFIRMASI PESANAN</b>\n\n`;
-      telegramMessage += `📱 <b>No. WhatsApp:</b> ${phone}\n`;
+      let telegramMessage = `✅ <b>KONFIRMASI PESANAN</b>\n\n📱 <b>No. WhatsApp:</b> ${phone}\n`;
       if (orderId) telegramMessage += `🆔 <b>ID Pesanan:</b> ${orderId}\n`;
       telegramMessage += `🕐 <b>Waktu:</b> ${formatDate(msgTime)}\n`;
       if (message) telegramMessage += `\n💬 <b>Pesan:</b>\n${message}\n`;
@@ -1259,7 +1173,6 @@
     }
 
     function setupEventListeners() {
-      // Menu dropdown
       document.getElementById('btnMenu').addEventListener('click', (e) => {
         e.stopPropagation();
         document.getElementById('dropdownMenu').classList.toggle('is-hidden');
@@ -1272,7 +1185,6 @@
       document.getElementById('menuJoinJualan').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openJoinJualanModal(); });
       document.getElementById('menuInstallApp').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openInstallAppModal(); });
       
-      // Modal overlays
       document.getElementById('caraOrderOverlay').addEventListener('click', closeCaraOrderModal);
       document.getElementById('kritikSaranOverlay').addEventListener('click', closeKritikSaranModal);
       document.getElementById('infoOfflineOverlay').addEventListener('click', closeInfoOfflineModal);
@@ -1283,14 +1195,12 @@
       document.getElementById('historyOverlay').addEventListener('click', closeHistoryModal);
       document.getElementById('confirmOrderOverlay').addEventListener('click', closeConfirmOrderModal);
       
-      // Cart
       document.getElementById('btnHistory').addEventListener('click', openHistoryModal);
       document.getElementById('btnCart').addEventListener('click', openCartModal);
       document.getElementById('btnFloatingCart').addEventListener('click', openCartModal);
       document.getElementById('btnClearCart').addEventListener('click', clearCart);
       document.getElementById('btnCheckout').addEventListener('click', proceedToCheckout);
       
-      // Checkout
       document.getElementById('btnBackCheckout').addEventListener('click', function() {
         if (currentCheckoutStep > 1) {
           currentCheckoutStep--;
@@ -1305,10 +1215,8 @@
       document.getElementById('btnConfirmPayment').addEventListener('click', confirmPayment);
       document.getElementById('btnOpenLiveChat').addEventListener('click', () => { closeCheckoutModal(); openConfirmOrderModal(); });
       
-      // History
       document.getElementById('btnLoadHistory').addEventListener('click', loadHistory);
       
-      // Confirm Order Button & Modal
       document.getElementById('confirmOrderBtn').addEventListener('click', openConfirmOrderModal);
       document.getElementById('confirmImageInput').addEventListener('change', handleConfirmImageSelect);
       document.getElementById('confirmCameraInput').addEventListener('change', handleConfirmImageSelect);
@@ -1316,7 +1224,6 @@
       document.getElementById('btnSubmitConfirm').addEventListener('click', submitConfirmation);
       document.getElementById('openConfirmFromFooter').addEventListener('click', (e) => { e.preventDefault(); openConfirmOrderModal(); });
       
-      // Special buttons
       document.getElementById('btnOpenChatForSaran').addEventListener('click', () => { closeKritikSaranModal(); openConfirmOrderModal(); });
       document.getElementById('btnChatForJoin').addEventListener('click', () => {
         closeJoinJualanModal();
@@ -1325,44 +1232,7 @@
       });
     }
 
-    // Register Service Worker for PWA
-    async function registerServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        try {
-          // Create inline service worker
-          const swCode = `
-            const CACHE_NAME = 'dotopup-v1';
-            const urlsToCache = ['/'];
-              
-            self.addEventListener('install', (event) => {
-              event.waitUntil(
-                caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
-              );
-              self.skipWaiting();
-            });
-              
-            self.addEventListener('fetch', (event) => {
-              event.respondWith(
-                caches.match(event.request).then((response) => response || fetch(event.request))
-              );
-            });
-          `;
-          
-          const blob = new Blob([swCode], { type: 'application/javascript' });
-          const swUrl = URL.createObjectURL(blob);
-          
-          await navigator.serviceWorker.register(swUrl, { scope: '/' });
-          console.log('Service Worker registered');
-        } catch (error) {
-          console.log('Service Worker registration failed:', error);
-        }
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      init();
-      registerServiceWorker();
-    });
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
