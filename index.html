@@ -376,7 +376,15 @@
         
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">🆔 ID Pesanan (opsional)</label>
-          <input type="text" id="confirmOrderId" placeholder="Contoh: ORD-XXXX" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <input type="text" id="confirmOrderId" placeholder="Contoh: WFI-XXX" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+        </div>
+        
+        <!-- Preview Detail Pesanan -->
+        <div id="confirmOrderPreview" class="mb-4 is-hidden">
+          <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+            <p class="text-sm font-semibold text-emerald-700 mb-2">📦 Detail Pesanan Ditemukan:</p>
+            <div id="confirmOrderPreviewContent" class="text-sm text-gray-700 space-y-1"></div>
+          </div>
         </div>
         
         <div class="mb-4">
@@ -1089,17 +1097,34 @@
       document.getElementById('confirmOrderModal').classList.remove('is-hidden');
       document.body.style.overflow = 'hidden';
       hideConfirmBtn();
+      
+      // Pre-fill dari currentOrder jika ada
       if (currentOrder) {
         document.getElementById('confirmOrderId').value = currentOrder.id;
+        // Pre-fill phone dari order
+        if (currentOrder.noWhatsapp) {
+          // Convert dari format 62xxx ke 0xxx untuk display
+          const phone = currentOrder.noWhatsapp.startsWith('62') 
+            ? '0' + currentOrder.noWhatsapp.slice(2) 
+            : currentOrder.noWhatsapp;
+          document.getElementById('confirmPhone').value = phone;
+        }
+      } else {
+        // Coba ambil phone dari saved user
         const savedUser = safeLocalStorage('get', 'wifi_chat_user');
         if (savedUser?.phone) document.getElementById('confirmPhone').value = savedUser.phone;
       }
+      
+      // Update preview jika ada order ID
+      updateOrderPreview();
     }
     
     function closeConfirmOrderModal() {
       document.getElementById('confirmOrderModal').classList.add('is-hidden');
       document.body.style.overflow = '';
       showConfirmBtn();
+      // Reset preview
+      document.getElementById('confirmOrderPreview').classList.add('is-hidden');
     }
     
     function handleConfirmImageSelect(e) {
@@ -1124,6 +1149,67 @@
       document.getElementById('confirmCameraInput').value = '';
     }
     
+    // Fungsi untuk update preview pesanan
+    function updateOrderPreview() {
+      const orderId = document.getElementById('confirmOrderId').value.trim();
+      const previewContainer = document.getElementById('confirmOrderPreview');
+      const previewContent = document.getElementById('confirmOrderPreviewContent');
+      
+      if (!orderId) {
+        previewContainer.classList.add('is-hidden');
+        return;
+      }
+      
+      const order = findOrderById(orderId);
+      if (order && order.items && order.items.length > 0) {
+        let html = '';
+        order.items.forEach((item, idx) => {
+          html += `<div class="flex justify-between"><span>${idx + 1}. ${item.nama} x${item.quantity}</span><span class="font-medium">${formatRupiah(item.harga * item.quantity)}</span></div>`;
+        });
+        html += `<div class="border-t border-emerald-300 pt-1 mt-1 flex justify-between font-bold text-emerald-700"><span>Total</span><span>${formatRupiah(order.total)}</span></div>`;
+        previewContent.innerHTML = html;
+        previewContainer.classList.remove('is-hidden');
+      } else {
+        previewContainer.classList.add('is-hidden');
+      }
+    }
+    
+    // Fungsi untuk mencari pesanan berdasarkan ID
+    function findOrderById(orderId) {
+      if (!orderId) return null;
+      // Cek currentOrder dulu
+      if (currentOrder && currentOrder.id === orderId) return currentOrder;
+      // Cari di localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('wifi_orders_')) {
+          try {
+            const orders = JSON.parse(localStorage.getItem(key));
+            if (Array.isArray(orders)) {
+              const found = orders.find(o => o.id === orderId);
+              if (found) return found;
+            }
+          } catch (e) { continue; }
+        }
+      }
+      return null;
+    }
+    
+    // Fungsi untuk format detail paket
+    function formatPackageDetails(order) {
+      if (!order || !order.items || order.items.length === 0) return '';
+      let details = '📦 <b>Detail Pesanan:</b>\n';
+      details += '─────────────────\n';
+      order.items.forEach((item, idx) => {
+        const subtotal = item.harga * item.quantity;
+        details += `${idx + 1}. ${item.nama}\n`;
+        details += `   ${item.quantity}x ${formatRupiah(item.harga)} = ${formatRupiah(subtotal)}\n`;
+      });
+      details += '─────────────────\n';
+      details += `💰 <b>Total: ${formatRupiah(order.total)}</b>\n`;
+      return details;
+    }
+
     async function submitConfirmation() {
       const phone = document.getElementById('confirmPhone').value.trim();
       const orderId = document.getElementById('confirmOrderId').value.trim();
@@ -1135,12 +1221,22 @@
       
       safeLocalStorage('set', 'wifi_chat_user', { phone });
       
+      // Cari data pesanan berdasarkan ID
+      const orderData = findOrderById(orderId);
+      
       const msgTime = Date.now();
-      let telegramMessage = `✅ <b>KONFIRMASI PESANAN</b>\n\n📱 <b>No. WhatsApp:</b> ${phone}\n`;
-      if (orderId) telegramMessage += `🆔 <b>ID Pesanan:</b> ${orderId}\n`;
+      let telegramMessage = `✅ <b>KONFIRMASI PESANAN</b>\n\n`;
+      telegramMessage += `📱 <b>No. WhatsApp:</b> ${phone}\n`;
+      if (orderId) telegramMessage += `🆔 <b>ID Pesanan:</b> <code>${orderId}</code>\n`;
       telegramMessage += `🕐 <b>Waktu:</b> ${formatDate(msgTime)}\n`;
+      
+      // Tambahkan detail paket jika ada data pesanan
+      if (orderData) {
+        telegramMessage += `\n${formatPackageDetails(orderData)}`;
+      }
+      
       if (message) telegramMessage += `\n💬 <b>Pesan:</b>\n${message}\n`;
-      telegramMessage += `\n---\n📍 ${CONFIG.namaToko}`;
+      telegramMessage += `\n───\n📍 ${CONFIG.namaToko}`;
       
       showToast('Mengirim konfirmasi...');
       
@@ -1223,6 +1319,10 @@
       document.getElementById('confirmRemoveImage').addEventListener('click', removeConfirmImage);
       document.getElementById('btnSubmitConfirm').addEventListener('click', submitConfirmation);
       document.getElementById('openConfirmFromFooter').addEventListener('click', (e) => { e.preventDefault(); openConfirmOrderModal(); });
+      
+      // Event listener untuk update preview saat order ID diubah
+      document.getElementById('confirmOrderId').addEventListener('input', updateOrderPreview);
+      document.getElementById('confirmOrderId').addEventListener('blur', updateOrderPreview);
       
       document.getElementById('btnOpenChatForSaran').addEventListener('click', () => { closeKritikSaranModal(); openConfirmOrderModal(); });
       document.getElementById('btnChatForJoin').addEventListener('click', () => {
