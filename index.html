@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WIFI CIWATIN - DOTOPUP</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#10b981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="DOTOPUP">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="WiFi Voucher Store - Internet Cepat & Terjangkau">
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0' stop-color='%2310b981'/%3E%3Cstop offset='1' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Cpath d='M30 40h40M40 20v40' stroke='white' stroke-width='8' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='50' r='15' fill='white'/%3E%3C/svg%3E">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIldJRkkgQ0lXQVRJTiAtIERPVE9QVVAiLAogICJzaG9ydF9uYW1lIjogIkRPVE9QVVAiLAogICJkZXNjcmlwdGlvbiI6ICJXaUZpIFZvdWNoZXIgU3RvcmUgLSBJbnRlcm5ldCBDZXBhdCAmIFRlcmphbmdrYXUiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2VjZmRmNSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMGI5ODEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnJTNFJTNDZGVmcyUzRSUzQ2xpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUyNScgeTE9JzAlMjUnIHgyPScxMDAlMjUnIHkyPScxMDAlMjUnJTNFJTNDc3RvcCBvZmZzZXQ9JzAnIHN0b3AtY29sb3I9JyUyMzEwYjk4MScvJTNFJTNDc3RvcCBvZmZzZXQ9JzEnIHN0b3AtY29sb3I9JyUyMzA2YjZkNCcvJTNFJTNDL2xpbmVhckdyYWRpZW50JTNFJTNDL2RlZnMlM0UlM0NyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJyByeD0nMjAnIGZpbGw9J3VybCglMjNnKScvJTNFJTNDcGF0aCBkPSdNMzAgNDBoNDBNNDAgMjB2NDAnIHN0cm9rZT0nd2hpdGUnIHN0cm9rZS13aWR0aD0nOCcgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8lM0UlM0NjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzE1JyBmaWxsPSd3aGl0ZSclMkYlM0UlM0MlMkZzdmclM0UiLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -193,6 +208,69 @@
     .image-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 8px; }
     .quick-msg-btn { padding: 8px 12px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 8px; font-size: 12px; color: #0369a1; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
     .quick-msg-btn:hover { background: #bae6fd; }
+    
+    /* Install App Banner */
+    .install-banner {
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .install-banner:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+    .install-banner-icon {
+      width: 48px;
+      height: 48px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .install-banner-icon svg {
+      width: 28px;
+      height: 28px;
+      color: #10b981;
+    }
+    
+    /* App Store Buttons */
+    .app-store-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: #000;
+      color: white;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .app-store-btn:hover {
+      background: #333;
+      transform: translateY(-2px);
+    }
+    .app-store-btn.play-store {
+      background: linear-gradient(135deg, #34a853 0%, #4285f4 100%);
+    }
+    .app-store-btn.play-store:hover {
+      background: linear-gradient(135deg, #2d9248 0%, #3b7de0 100%);
+    }
+    .app-store-btn.apk {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    .app-store-btn.apk:hover {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    }
   </style>
 </head>
 <body class="gradient-bg min-h-screen flex flex-col">
@@ -203,19 +281,31 @@
       namaToko: "WIFI CIWATIN",
       noWhatsappAdmin: "6281224940172",
       alamat: "Jl. Ciwatin Raya, Indonesia",
-      qrisDinamis: "https://drive.google.com/uc?export=view&id=YOUR_DYNAMIC_QRIS_ID",
+      qrisDinamis: "https://drive.google.com/uc?export=view&id=1YfkLZDmNt_VudODS_kPCBjZkDERDwWfQ",
       telegramBotToken: "8658739721:AAFCGFXDWukO8psp-n4wKZFY99HFKiFB3V0",
       telegramChatId: "1616582272",
       
+      // QRIS Images per nominal
+      qrisImages: {
+        1000: "https://drive.google.com/uc?export=view&id=1LW9iabbZ2vw8F6nuVYm8l8-UlBCPQmf6",
+        2000: "https://drive.google.com/uc?export=view&id=1ctOlUttmK4Z4T6vj1zEC894LD8Cs-Tl-",
+        3000: "https://drive.google.com/uc?export=view&id=167po9cTDTEEL-lWILaExJ-qOIAerGsvY",
+        4000: "https://drive.google.com/uc?export=view&id=1WBmHYV44wa_2-SdCSaeQRge9rleXKS0S",
+        5000: "https://drive.google.com/uc?export=view&id=12FBSHS93yutAaV4RE2HXzCe48ww-ONCg",
+        7000: "https://drive.google.com/uc?export=view&id=1d_GZagyPNLkqGPbktn7eBhaMiopYlTIs",
+        13000: "https://drive.google.com/uc?export=view&id=1bwfSmTpiu8aYnOT1oW6BAxjOGJWYxel2",
+        100000: "https://drive.google.com/uc?export=view&id=1HZtBM8zP8xoSQHyl1X1WOFP89lUT4Dmj"
+      },
+      
       paket: [
-        { id: "1", nama: "Paket 2 Jam", durasi: "2 Jam", harga: 1000, kecepatan: "Unlimited", kategori: "cepat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_1" },
-        { id: "2", nama: "Paket 5 Jam", durasi: "5 Jam", harga: 2000, kecepatan: "Unlimited", kategori: "cepat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_2" },
-        { id: "3", nama: "Paket 12 Jam", durasi: "12 Jam", harga: 3000, kecepatan: "Unlimited", kategori: "cepat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_3" },
-        { id: "4", nama: "Paket 1 Hari", durasi: "24 Jam", harga: 4000, kecepatan: "Unlimited", kategori: "harian", bestSeller: true, qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_4" },
-        { id: "5", nama: "Paket 2 Hari", durasi: "2 Hari", harga: 5000, kecepatan: "Unlimited", kategori: "harian", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_5" },
-        { id: "6", nama: "Paket 3 Hari", durasi: "3 Hari", harga: 7000, kecepatan: "Unlimited", kategori: "harian", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_6" },
-        { id: "7", nama: "Paket 6 Hari", durasi: "6 Hari", harga: 13000, kecepatan: "Unlimited", kategori: "mingguan", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_7" },
-        { id: "8", nama: "Paket 1 Bulan", durasi: "1 Bulan", harga: 150000, kecepatan: "Unlimited", kategori: "rumah", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_8" }
+        { id: "1", nama: "Paket 2 Jam", durasi: "2 Jam", harga: 1000, kecepatan: "Unlimited", kategori: "cepat" },
+        { id: "2", nama: "Paket 5 Jam", durasi: "5 Jam", harga: 2000, kecepatan: "Unlimited", kategori: "cepat" },
+        { id: "3", nama: "Paket 12 Jam", durasi: "12 Jam", harga: 3000, kecepatan: "Unlimited", kategori: "cepat" },
+        { id: "4", nama: "Paket 1 Hari", durasi: "24 Jam", harga: 4000, kecepatan: "Unlimited", kategori: "harian", bestSeller: true },
+        { id: "5", nama: "Paket 2 Hari", durasi: "2 Hari", harga: 5000, kecepatan: "Unlimited", kategori: "harian" },
+        { id: "6", nama: "Paket 3 Hari", durasi: "3 Hari", harga: 7000, kecepatan: "Unlimited", kategori: "harian" },
+        { id: "7", nama: "Paket 6 Hari", durasi: "6 Hari", harga: 13000, kecepatan: "Unlimited", kategori: "mingguan" },
+        { id: "8", nama: "Paket 1 Bulan", durasi: "1 Bulan", harga: 100000, kecepatan: "Unlimited", kategori: "rumah" }
       ]
     };
   </script>
@@ -258,6 +348,10 @@
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               <span>Join Jualan Voucher</span>
             </div>
+            <div id="menuInstallApp" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Install Aplikasi</span>
+            </div>
           </div>
         </div>
         
@@ -289,6 +383,19 @@
   <!-- Package Categories -->
   <main class="flex-1 px-3 sm:px-4 pb-24 sm:pb-8">
     <div class="container mx-auto">
+      
+      <!-- Install App Banner -->
+      <div id="installBanner" class="install-banner" onclick="openInstallAppModal()">
+        <div class="install-banner-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+        </div>
+        <div class="flex-1">
+          <p class="font-bold text-sm">📱 Install Aplikasi DOTOPUP</p>
+          <p class="text-xs opacity-90">Dapatkan notifikasi & akses lebih cepat!</p>
+        </div>
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      </div>
+      
       <div class="mb-4 flex flex-wrap gap-2 justify-center">
         <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">🔹 Paket Cepat</span>
         <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">🔹 Paket Harian</span>
@@ -507,6 +614,73 @@
     </div>
   </div>
 
+  <!-- Install App Modal -->
+  <div id="installAppModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" id="installAppOverlay"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeInstallAppModal()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Kembali
+          </button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeInstallAppModal()">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div class="text-center mb-6">
+          <div class="w-20 h-20 mx-auto mb-4 rounded-2xl gradient-btn flex items-center justify-center shadow-lg">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">📱 Install DOTOPUP</h3>
+          <p class="text-sm text-gray-600 mt-2">Pasang aplikasi di HP Anda untuk akses lebih cepat!</p>
+        </div>
+        
+        <!-- PWA Install Button (shown when available) -->
+        <button id="pwaInstallBtn" class="w-full gradient-btn text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-3 mb-4 is-hidden">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Install Sekarang
+        </button>
+        
+        <!-- Manual Install Instructions -->
+        <div id="manualInstallInstructions" class="bg-gray-50 rounded-xl p-4">
+          <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Cara Manual Install
+          </h4>
+          
+          <!-- Chrome/Android -->
+          <div class="mb-4">
+            <p class="text-sm font-medium text-gray-700 mb-2">📱 Android (Chrome):</p>
+            <ol class="text-sm text-gray-600 space-y-1 ml-4 list-decimal">
+              <li>Ketuk titik tiga (⋮) di pojok kanan atas</li>
+              <li>Pilih <strong>"Add to Home screen"</strong> atau <strong>"Tambahkan ke layar utama"</strong></li>
+              <li>Ketuk <strong>"Install"</strong></li>
+            </ol>
+          </div>
+          
+          <!-- Safari/iOS -->
+          <div class="mb-4">
+            <p class="text-sm font-medium text-gray-700 mb-2">🍎 iPhone/iPad (Safari):</p>
+            <ol class="text-sm text-gray-600 space-y-1 ml-4 list-decimal">
+              <li>Ketuk tombol Share <strong>(↑)</strong> di bawah</li>
+              <li>Pilih <strong>"Add to Home Screen"</strong></li>
+              <li>Ketuk <strong>"Add"</strong> di pojok kanan atas</li>
+            </ol>
+          </div>
+        </div>
+        
+        <div class="mt-4 p-3 bg-emerald-50 rounded-lg">
+          <p class="text-xs text-emerald-700 text-center">
+            <strong>✨ Keuntungan Install:</strong><br>
+            Akses 1 klik dari home screen • Notifikasi pesanan • Tanpa browser
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Cart Modal -->
   <div id="cartModal" class="fixed inset-0 z-50 is-hidden">
     <div class="modal-overlay absolute inset-0" id="cartOverlay"></div>
@@ -709,6 +883,57 @@
     function openJoinJualanModal() { document.getElementById('joinJualanModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; }
     function closeJoinJualanModal() { document.getElementById('joinJualanModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
     
+    // PWA Install
+    let deferredPrompt = null;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Show install button in modal
+      document.getElementById('pwaInstallBtn').classList.remove('is-hidden');
+    });
+    
+    // Hide banner when app is installed
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.add('is-hidden');
+      document.getElementById('pwaInstallBtn').classList.add('is-hidden');
+      showToast('Aplikasi berhasil diinstall!');
+    });
+    
+    // Check if running as PWA
+    function isRunningAsPWA() {
+      return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+    
+    function openInstallAppModal() { 
+      document.getElementById('installAppModal').classList.remove('is-hidden'); 
+      document.body.style.overflow = 'hidden';
+    }
+    function closeInstallAppModal() { document.getElementById('installAppModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    
+    // PWA Install Button Handler
+    document.addEventListener('DOMContentLoaded', () => {
+      // Hide banner if already installed as PWA
+      if (isRunningAsPWA()) {
+        document.getElementById('installBanner').classList.add('is-hidden');
+      }
+      
+      document.getElementById('pwaInstallBtn').addEventListener('click', async () => {
+        if (!deferredPrompt) {
+          showToast('Gunakan menu browser "Add to Home Screen"');
+          return;
+        }
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          closeInstallAppModal();
+        }
+        deferredPrompt = null;
+        document.getElementById('pwaInstallBtn').classList.add('is-hidden');
+      });
+    });
+    
     function openCartModal() { document.getElementById('cartModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; renderCartItems(); }
     function closeCartModal() { document.getElementById('cartModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
     
@@ -891,10 +1116,18 @@
       document.getElementById('orderIdDisplay').textContent = currentOrder.id;
       document.getElementById('paymentTotal').textContent = formatRupiah(total);
       
-      const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
-      document.getElementById('qrisImage').src = paket?.qrisImage || CONFIG.qrisDinamis;
+      // Get QRIS image based on total amount
+      let qrisSrc = CONFIG.qrisDinamis;
+      if (currentOrder.items.length === 1) {
+        const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
+        const harga = paket?.harga;
+        if (CONFIG.qrisImages[harga]) {
+          qrisSrc = CONFIG.qrisImages[harga];
+        }
+      }
+      document.getElementById('qrisImage').src = qrisSrc;
       document.getElementById('qrisInfo').innerHTML = currentOrder.items.length === 1 
-        ? '<span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mb-2">QRIS Nominal Tetap</span>'
+        ? '<span class="inline-block bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded mb-2">✓ QRIS Sesuai Nominal</span>'
         : `<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800"><strong>QRIS Dinamis:</strong> Masukkan nominal <strong>${formatRupiah(total)}</strong></div>`;
     }
 
@@ -1069,12 +1302,14 @@
       document.getElementById('menuKritikSaran').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openKritikSaranModal(); });
       document.getElementById('menuInfoOffline').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openInfoOfflineModal(); });
       document.getElementById('menuJoinJualan').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openJoinJualanModal(); });
+      document.getElementById('menuInstallApp').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openInstallAppModal(); });
       
       // Modal overlays
       document.getElementById('caraOrderOverlay').addEventListener('click', closeCaraOrderModal);
       document.getElementById('kritikSaranOverlay').addEventListener('click', closeKritikSaranModal);
       document.getElementById('infoOfflineOverlay').addEventListener('click', closeInfoOfflineModal);
       document.getElementById('joinJualanOverlay').addEventListener('click', closeJoinJualanModal);
+      document.getElementById('installAppOverlay').addEventListener('click', closeInstallAppModal);
       document.getElementById('cartOverlay').addEventListener('click', closeCartModal);
       document.getElementById('checkoutOverlay').addEventListener('click', closeCheckoutModal);
       document.getElementById('historyOverlay').addEventListener('click', closeHistoryModal);
@@ -1127,7 +1362,44 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', init);
+    // Register Service Worker for PWA
+    async function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        try {
+          // Create inline service worker
+          const swCode = `
+            const CACHE_NAME = 'dotopup-v1';
+            const urlsToCache = ['/'];
+              
+            self.addEventListener('install', (event) => {
+              event.waitUntil(
+                caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+              );
+              self.skipWaiting();
+            });
+              
+            self.addEventListener('fetch', (event) => {
+              event.respondWith(
+                caches.match(event.request).then((response) => response || fetch(event.request))
+              );
+            });
+          `;
+          
+          const blob = new Blob([swCode], { type: 'application/javascript' });
+          const swUrl = URL.createObjectURL(blob);
+          
+          await navigator.serviceWorker.register(swUrl, { scope: '/' });
+          console.log('Service Worker registered');
+        } catch (error) {
+          console.log('Service Worker registration failed:', error);
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      init();
+      registerServiceWorker();
+    });
   </script>
 </body>
 </html>
