@@ -70,93 +70,26 @@
     .dropdown-item:hover { background: #f5f5f5; }
     .dropdown-item svg { width: 20px; height: 20px; color: #6b7280; flex-shrink: 0; }
     
-    .chat-widget-btn {
+    .confirm-order-btn {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0088cc 0%, #00a8e8 100%);
-      box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4);
+      padding: 14px 24px;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
       cursor: pointer;
       z-index: 999;
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 8px;
       transition: all 0.3s ease;
-    }
-    .chat-widget-btn:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(0, 136, 204, 0.5); }
-    
-    .chat-window {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-      max-width: 400px;
-      height: 100dvh;
-      max-height: 100dvh;
-      background: white;
-      z-index: 1001;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      animation: slideUp 0.3s ease-out;
-    }
-    
-    @media (min-width: 640px) {
-      .chat-window {
-        bottom: 90px;
-        right: 20px;
-        width: 380px;
-        height: auto;
-        max-height: calc(100dvh - 110px);
-        min-height: 500px;
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      }
-    }
-    
-    .chat-header {
-      background: linear-gradient(135deg, #0088cc 0%, #00a8e8 100%);
       color: white;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-    
-    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: #f5f5f5; min-height: 0; }
-    .chat-message { margin-bottom: 12px; display: flex; flex-direction: column; }
-    .chat-message.sent { align-items: flex-end; }
-    .chat-message.received { align-items: flex-start; }
-    
-    .chat-bubble {
-      max-width: 85%;
-      padding: 10px 14px;
-      border-radius: 16px;
+      font-weight: 600;
       font-size: 14px;
-      line-height: 1.4;
-      word-wrap: break-word;
+      border: none;
     }
-    .chat-message.sent .chat-bubble {
-      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-    .chat-message.received .chat-bubble {
-      background: white;
-      color: #333;
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .chat-time { font-size: 10px; color: #999; margin-top: 4px; }
-    .chat-input-area { padding: 12px; background: white; border-top: 1px solid #eee; flex-shrink: 0; }
-    .chat-status { display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 6px 10px; background: rgba(255,255,255,0.2); border-radius: 8px; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: blink 1.5s infinite; }
-    
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .confirm-order-btn:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); }
     
     .upload-method-btn {
       flex: 1;
@@ -188,8 +121,6 @@
       border: none;
     }
     .btn-back:hover { background: #e5e7eb; }
-    
-    body.chat-open { overflow: hidden; }
     
     .best-value-badge {
       position: absolute;
@@ -281,20 +212,20 @@
       namaToko: "WIFI CIWATIN",
       noWhatsappAdmin: "6281224940172",
       alamat: "Jl. Ciwatin Raya, Indonesia",
-      qrisDinamis: "https://drive.google.com/uc?export=view&id=1YfkLZDmNt_VudODS_kPCBjZkDERDwWfQ",
+      qrisDinamis: "https://lh3.googleusercontent.com/d/1YfkLZDmNt_VudODS_kPCBjZkDERDwWfQ=w1000",
       telegramBotToken: "8658739721:AAFCGFXDWukO8psp-n4wKZFY99HFKiFB3V0",
       telegramChatId: "1616582272",
       
-      // QRIS Images per nominal
+      // QRIS Images per nominal (gunakan format lh3.googleusercontent.com)
       qrisImages: {
-        1000: "https://drive.google.com/uc?export=view&id=1LW9iabbZ2vw8F6nuVYm8l8-UlBCPQmf6",
-        2000: "https://drive.google.com/uc?export=view&id=1ctOlUttmK4Z4T6vj1zEC894LD8Cs-Tl-",
-        3000: "https://drive.google.com/uc?export=view&id=167po9cTDTEEL-lWILaExJ-qOIAerGsvY",
-        4000: "https://drive.google.com/uc?export=view&id=1WBmHYV44wa_2-SdCSaeQRge9rleXKS0S",
-        5000: "https://drive.google.com/uc?export=view&id=12FBSHS93yutAaV4RE2HXzCe48ww-ONCg",
-        7000: "https://drive.google.com/uc?export=view&id=1d_GZagyPNLkqGPbktn7eBhaMiopYlTIs",
-        13000: "https://drive.google.com/uc?export=view&id=1bwfSmTpiu8aYnOT1oW6BAxjOGJWYxel2",
-        100000: "https://drive.google.com/uc?export=view&id=1HZtBM8zP8xoSQHyl1X1WOFP89lUT4Dmj"
+        1000: "https://lh3.googleusercontent.com/d/1LW9iabbZ2vw8F6nuVYm8l8-UlBCPQmf6=w1000",
+        2000: "https://lh3.googleusercontent.com/d/1ctOlUttmK4Z4T6vj1zEC894LD8Cs-Tl-=w1000",
+        3000: "https://lh3.googleusercontent.com/d/167po9cTDTEEL-lWILaExJ-qOIAerGsvY=w1000",
+        4000: "https://lh3.googleusercontent.com/d/1WBmHYV44wa_2-SdCSaeQRge9rleXKS0S=w1000",
+        5000: "https://lh3.googleusercontent.com/d/12FBSHS93yutAaV4RE2HXzCe48ww-ONCg=w1000",
+        7000: "https://lh3.googleusercontent.com/d/1d_GZagyPNLkqGPbktn7eBhaMiopYlTIs=w1000",
+        13000: "https://lh3.googleusercontent.com/d/1bwfSmTpiu8aYnOT1oW6BAxjOGJWYxel2=w1000",
+        100000: "https://lh3.googleusercontent.com/d/1HZtBM8zP8xoSQHyl1X1WOFP89lUT4Dmj=w1000"
       },
       
       paket: [
@@ -430,9 +361,9 @@
           WhatsApp
         </a>
         <span class="text-gray-600">|</span>
-        <a href="#" id="openChatFromFooter" class="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.78.47 3.45 1.29 4.89L2 22l5.11-1.29C8.55 21.53 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
-          Live Chat
+        <a href="#" id="openConfirmFromFooter" class="flex items-center gap-2 text-cyan-400 hover:text-cyan-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Konfirmasi
         </a>
       </div>
       <p class="text-gray-500 text-xs mt-4" id="copyright"></p>
@@ -440,73 +371,81 @@
     </div>
   </footer>
 
-  <!-- ==================== LIVE CHAT WIDGET ==================== -->
-  <div id="chatWidgetBtn" class="chat-widget-btn" title="Live Chat">
-    <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-      <path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
-    </svg>
-  </div>
+  <!-- ==================== KONFIRMASI PESANAN BUTTON ==================== -->
+  <button id="confirmOrderBtn" class="confirm-order-btn" title="Konfirmasi Pesanan">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Konfirmasi Pesanan
+  </button>
   
-  <div id="chatWindow" class="chat-window is-hidden">
-    <div class="chat-header">
-      <button id="btnBackFromChat" class="p-2 hover:bg-white/20 rounded-lg transition flex-shrink-0" title="Kembali">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-      </button>
-      <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.78.47 3.45 1.29 4.89L2 22l5.11-1.29C8.55 21.53 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
-      </div>
-      <div class="flex-1 min-w-0">
-        <h4 class="font-semibold text-white text-sm" id="chatStoreName">WIFI CIWATIN</h4>
-        <div class="chat-status"><span class="status-dot"></span><span>Online</span></div>
-      </div>
-      <button id="closeChatBtn" class="p-2 hover:bg-white/20 rounded-lg transition flex-shrink-0" title="Tutup Chat">
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-    </div>
-    
-    <div id="chatMessages" class="chat-messages">
-      <div class="chat-message received">
-        <div class="chat-bubble">👋 Halo! Selamat datang di <strong>WIFI CIWATIN</strong><br><br>📱 <strong>Kode voucher akan dikirim via WhatsApp</strong><br>Pastikan memasukkan nomor WhatsApp yang aktif!</div>
-        <span class="chat-time">Bot</span>
-      </div>
-    </div>
-    
-    <div class="chat-input-area">
-      <div class="flex flex-wrap gap-2 mb-3">
-        <button id="quickMsgOrder" class="quick-msg-btn">📦 Saya sudah order</button>
-      </div>
-      <div class="mb-2">
-        <label class="block text-xs font-medium text-gray-600 mb-1">📱 Nomor WhatsApp (untuk kirim voucher)</label>
-        <input type="tel" id="chatUserPhone" placeholder="Contoh: 08123456789" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <div class="mb-2">
-        <label class="block text-xs font-medium text-gray-600 mb-1">📷 Upload Bukti Transaksi</label>
-        <div class="flex gap-2">
-          <label class="upload-method-btn">
-            <input type="file" id="imageInput" accept="image/*" class="is-hidden">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          </label>
-          <label class="upload-method-btn">
-            <input type="file" id="cameraInput" accept="image/*" capture="environment" class="is-hidden">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          </label>
-        </div>
-        <div id="imagePreviewContainer" class="is-hidden mt-2 p-2 bg-gray-50 rounded-lg">
-          <img id="imagePreview" class="image-preview mx-auto" alt="Preview">
-          <button id="removeImage" class="w-full mt-2 text-red-500 text-xs hover:underline flex items-center justify-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            Hapus
+  <!-- ==================== MODAL KONFIRMASI PESANAN ==================== -->
+  <div id="confirmOrderModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" id="confirmOrderOverlay"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeConfirmOrderModal()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Kembali
+          </button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeConfirmOrderModal()">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
         </div>
-      </div>
-      <div class="flex gap-2">
-        <input type="text" id="chatInput" placeholder="Ketik pesan..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-        <button id="sendChatBtn" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition flex items-center justify-center flex-shrink-0">
+        
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full gradient-btn flex items-center justify-center shadow-lg">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">Konfirmasi Pesanan</h3>
+          <p class="text-sm text-gray-600 mt-1">Upload bukti pembayaran Anda</p>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">📱 Nomor WhatsApp</label>
+          <input type="tel" id="confirmPhone" placeholder="Contoh: 08123456789" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <p class="text-xs text-gray-500 mt-1">Voucher akan dikirim ke nomor ini</p>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">🆔 ID Pesanan (opsional)</label>
+          <input type="text" id="confirmOrderId" placeholder="Contoh: ORD-XXXX" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">📷 Bukti Pembayaran</label>
+          <div class="flex gap-2">
+            <label class="upload-method-btn flex-1">
+              <input type="file" id="confirmImageInput" accept="image/*" class="is-hidden">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span class="text-xs mt-1">Galeri</span>
+            </label>
+            <label class="upload-method-btn flex-1">
+              <input type="file" id="confirmCameraInput" accept="image/*" capture="environment" class="is-hidden">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span class="text-xs mt-1">Kamera</span>
+            </label>
+          </div>
+          <div id="confirmImagePreviewContainer" class="is-hidden mt-3 p-2 bg-gray-50 rounded-lg">
+            <img id="confirmImagePreview" class="image-preview mx-auto" alt="Preview">
+            <button id="confirmRemoveImage" class="w-full mt-2 text-red-500 text-xs hover:underline flex items-center justify-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              Hapus Gambar
+            </button>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">💬 Pesan (opsional)</label>
+          <textarea id="confirmMessage" rows="2" placeholder="Tambahkan pesan..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"></textarea>
+        </div>
+        
+        <button id="btnSubmitConfirm" class="w-full gradient-btn text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+          Kirim Konfirmasi
         </button>
+        
+        <p class="text-xs text-gray-500 text-center mt-3">Konfirmasi akan dikirim via Telegram ke admin</p>
       </div>
-      <p class="text-xs text-gray-400 mt-2 text-center">Tekan tombol kirim untuk mengirim pesan</p>
     </div>
   </div>
 
@@ -745,7 +684,14 @@
             <button id="btnCopyOrderId" class="p-2 hover:bg-blue-100 rounded-lg">📋</button>
           </div>
           <div id="qrisInfo" class="text-center"></div>
-          <div class="flex justify-center"><div class="bg-white p-3 rounded-xl shadow-lg border"><img id="qrisImage" src="" alt="QRIS Payment" class="w-56 h-56 sm:w-64 sm:h-64 object-contain"></div></div>
+          <div class="flex justify-center">
+            <div class="bg-white p-3 rounded-xl shadow-lg border">
+              <img id="qrisImage" src="" alt="QRIS Payment" class="w-56 h-56 sm:w-64 sm:h-64 object-contain" onerror="handleQrisError(this)">
+            </div>
+          </div>
+          <div id="qrisError" class="is-hidden bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p class="text-red-700 text-sm">⚠️ Gagal memuat QRIS. <button onclick="retryQris()" class="underline text-blue-600">Coba lagi</button></p>
+          </div>
           <div class="text-center"><p class="text-lg font-bold text-emerald-600">Transfer: <span id="paymentTotal">Rp 0</span></p></div>
           <button id="btnConfirmPayment" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2 pulse-glow">✅ Saya Sudah Bayar</button>
         </div>
@@ -798,10 +744,7 @@
     let cart = [];
     let currentOrder = null;
     let currentCheckoutStep = 1;
-    let chatMessages = [];
-    let chatUserInfo = null;
-    let selectedImage = null;
-    let selectedImageBase64 = null;
+    let confirmImageBase64 = null;
 
     function formatRupiah(amount) {
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
@@ -1129,6 +1072,53 @@
       document.getElementById('qrisInfo').innerHTML = currentOrder.items.length === 1 
         ? '<span class="inline-block bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded mb-2">✓ QRIS Sesuai Nominal</span>'
         : `<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800"><strong>QRIS Dinamis:</strong> Masukkan nominal <strong>${formatRupiah(total)}</strong></div>`;
+      
+      // Reset error state
+      document.getElementById('qrisError').classList.add('is-hidden');
+      document.getElementById('qrisImage').classList.remove('is-hidden');
+    }
+
+      // QRIS Error handling with fallback
+    function handleQrisError(img) {
+      console.log('QRIS image failed to load, trying fallback...');
+      const currentSrc = img.src;
+      
+      // Try alternative Google Drive formats
+      if (currentSrc.includes('lh3.googleusercontent.com')) {
+        // Try uc format
+        const fileId = currentSrc.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1];
+        if (fileId) {
+          img.src = `https://drive.google.com/uc?export=download&id=${fileId}`;
+          return;
+        }
+      } else if (currentSrc.includes('drive.google.com/uc')) {
+        // Try direct format
+        const fileId = currentSrc.match(/id=([a-zA-Z0-9_-]+)/)?.[1];
+        if (fileId) {
+          img.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+          return;
+        }
+      }
+      
+      // All fallbacks failed
+      img.classList.add('is-hidden');
+      document.getElementById('qrisError').classList.remove('is-hidden');
+    }
+
+    function retryQris() {
+      const img = document.getElementById('qrisImage');
+      // Get fresh URL from config
+      let qrisSrc = CONFIG.qrisDinamis;
+      if (currentOrder && currentOrder.items.length === 1) {
+        const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
+        const harga = paket?.harga;
+        if (CONFIG.qrisImages[harga]) {
+          qrisSrc = CONFIG.qrisImages[harga];
+        }
+      }
+      img.src = qrisSrc + (qrisSrc.includes('?') ? '&' : '?') + 't=' + Date.now();
+      img.classList.remove('is-hidden');
+      document.getElementById('qrisError').classList.add('is-hidden');
     }
 
     function copyOrderId() {
@@ -1177,101 +1167,81 @@
       `).join('');
     }
 
-    // Chat functions
-    function toggleChat() {
-      if (document.getElementById('chatWindow').classList.contains('is-hidden')) {
-        openChat();
-      } else {
-        closeChat();
-      }
-    }
+    // ==================== KONFIRMASI PESANAN ====================
     
-    function openChat() {
-      document.getElementById('chatWindow').classList.remove('is-hidden');
-      document.getElementById('chatWidgetBtn').classList.add('is-hidden');
-      document.body.classList.add('chat-open');
-      renderChatMessages();
-    }
-    
-    function closeChat() {
-      document.getElementById('chatWindow').classList.add('is-hidden');
-      document.getElementById('chatWidgetBtn').classList.remove('is-hidden');
-      document.body.classList.remove('chat-open');
-    }
-    
-    function openChatWithOrderInfo() {
-      openChat();
+    function openConfirmOrderModal() {
+      document.getElementById('confirmOrderModal').classList.remove('is-hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // Pre-fill order ID if there's a current order
       if (currentOrder) {
-        let itemsText = currentOrder.items.map(i => i.nama + ' x' + i.quantity).join(', ');
-        document.getElementById('chatInput').value = `Saya sudah order dengan ID: ${currentOrder.id}\nPaket: ${itemsText}\nTotal: ${formatRupiah(currentOrder.total)}\n\nIni bukti transaksinya.`;
+        document.getElementById('confirmOrderId').value = currentOrder.id;
         const savedUser = safeLocalStorage('get', 'wifi_chat_user');
-        if (savedUser?.phone) document.getElementById('chatUserPhone').value = savedUser.phone;
+        if (savedUser?.phone) document.getElementById('confirmPhone').value = savedUser.phone;
       }
     }
-
-    function loadChatHistory() {
-      const saved = safeLocalStorage('get', 'wifi_chat_history');
-      if (saved) chatMessages = saved;
-      const savedUser = safeLocalStorage('get', 'wifi_chat_user');
-      if (savedUser) {
-        chatUserInfo = savedUser;
-        document.getElementById('chatUserPhone').value = savedUser.phone || '';
-      }
+    
+    function closeConfirmOrderModal() {
+      document.getElementById('confirmOrderModal').classList.add('is-hidden');
+      document.body.style.overflow = '';
     }
-
-    function saveChatHistory() { safeLocalStorage('set', 'wifi_chat_history', chatMessages); }
-
-    function renderChatMessages() {
-      const container = document.getElementById('chatMessages');
-      let html = `<div class="chat-message received"><div class="chat-bubble">👋 Halo! Selamat datang di <strong>${CONFIG.namaToko}</strong><br><br>📱 <strong>Kode voucher akan dikirim via WhatsApp</strong><br>Pastikan nomor WhatsApp aktif!</div><span class="chat-time">Bot</span></div>`;
+    
+    function handleConfirmImageSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showToast('Pilih file gambar'); return; }
+      if (file.size > 5 * 1024 * 1024) { showToast('Maksimal 5MB'); return; }
       
-      chatMessages.forEach(msg => {
-        html += msg.type === 'sent' 
-          ? `<div class="chat-message sent"><div class="chat-bubble">${escapeHtml(msg.text)}</div><span class="chat-time">${formatTime(msg.time)}</span></div>${msg.hasImage ? '<div class="chat-message sent"><div class="chat-bubble">📷 Bukti transaksi terlampir</div></div>' : ''}`
-          : `<div class="chat-message received"><div class="chat-bubble">${escapeHtml(msg.text)}</div><span class="chat-time">${formatTime(msg.time)}</span></div>`;
-      });
-      
-      container.innerHTML = html;
-      container.scrollTop = container.scrollHeight;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        confirmImageBase64 = ev.target.result;
+        document.getElementById('confirmImagePreview').src = confirmImageBase64;
+        document.getElementById('confirmImagePreviewContainer').classList.remove('is-hidden');
+      };
+      reader.readAsDataURL(file);
     }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    
+    function removeConfirmImage() {
+      confirmImageBase64 = null;
+      document.getElementById('confirmImagePreviewContainer').classList.add('is-hidden');
+      document.getElementById('confirmImageInput').value = '';
+      document.getElementById('confirmCameraInput').value = '';
     }
-
-    async function sendChat() {
-      const message = document.getElementById('chatInput').value.trim();
-      const phone = document.getElementById('chatUserPhone').value.trim();
+    
+    async function submitConfirmation() {
+      const phone = document.getElementById('confirmPhone').value.trim();
+      const orderId = document.getElementById('confirmOrderId').value.trim();
+      const message = document.getElementById('confirmMessage').value.trim();
       
-      if (!message && !selectedImageBase64) { showToast('Masukkan pesan atau gambar'); return; }
       if (!phone) { showToast('Masukkan nomor WhatsApp'); return; }
       if (phone.replace(/\D/g, '').length < 10) { showToast('Nomor tidak valid'); return; }
+      if (!confirmImageBase64) { showToast('Upload bukti pembayaran'); return; }
       
-      chatUserInfo = { phone };
-      safeLocalStorage('set', 'wifi_chat_user', chatUserInfo);
+      // Save phone for next time
+      safeLocalStorage('set', 'wifi_chat_user', { phone });
       
       const msgTime = Date.now();
-      chatMessages.push({ type: 'sent', text: message || 'Bukti transaksi', time: msgTime, hasImage: !!selectedImageBase64 });
-      saveChatHistory();
-      renderChatMessages();
-      document.getElementById('chatInput').value = '';
+      let telegramMessage = `✅ <b>KONFIRMASI PESANAN</b>\n\n`;
+      telegramMessage += `📱 <b>No. WhatsApp:</b> ${phone}\n`;
+      if (orderId) telegramMessage += `🆔 <b>ID Pesanan:</b> ${orderId}\n`;
+      telegramMessage += `🕐 <b>Waktu:</b> ${formatDate(msgTime)}\n`;
+      if (message) telegramMessage += `\n💬 <b>Pesan:</b>\n${message}\n`;
+      telegramMessage += `\n---\n📍 ${CONFIG.namaToko}`;
       
-      const telegramMessage = `💬 <b>PESAN BARU dari Website</b>\n\n📱 <b>No. WhatsApp:</b> ${phone}\n🕐 <b>Waktu:</b> ${formatDate(msgTime)}\n\n💬 <b>Pesan:</b>\n${message || 'Bukti transaksi'}\n\n---\n📍 ${CONFIG.namaToko}`;
+      showToast('Mengirim konfirmasi...');
       
-      const result = await sendTelegramMessage(telegramMessage, selectedImageBase64);
+      const result = await sendTelegramMessage(telegramMessage, confirmImageBase64);
       
-      chatMessages.push({
-        type: 'received',
-        text: result.ok ? `✅ Pesan terkirim! Kode voucher akan dikirim ke WhatsApp (${phone}). Silakan tutup chat ini.` : '⚠️ Pesan disimpan. Hubungi admin via WhatsApp untuk respon cepat.',
-        time: Date.now()
-      });
-      
-      saveChatHistory();
-      renderChatMessages();
-      if (selectedImageBase64) removeImage();
-      showToast('Pesan terkirim!');
+      if (result.ok) {
+        showToast('✅ Konfirmasi terkirim!');
+        closeConfirmOrderModal();
+        removeConfirmImage();
+        document.getElementById('confirmPhone').value = '';
+        document.getElementById('confirmOrderId').value = '';
+        document.getElementById('confirmMessage').value = '';
+      } else {
+        showToast('⚠️ Gagal mengirim. Coba lagi.');
+      }
     }
 
     function init() {
@@ -1280,11 +1250,9 @@
       document.getElementById('footerAddress').textContent = CONFIG.alamat;
       document.getElementById('copyright').textContent = '© ' + new Date().getFullYear() + ' ' + CONFIG.namaToko;
       document.getElementById('whatsappLink').href = 'https://wa.me/' + CONFIG.noWhatsappAdmin;
-      document.getElementById('chatStoreName').textContent = CONFIG.namaToko;
       
       const savedCart = safeLocalStorage('get', 'wifi_cart');
       if (savedCart) cart = savedCart;
-      loadChatHistory();
       renderPackages();
       updateCartUI();
       setupEventListeners();
@@ -1313,6 +1281,7 @@
       document.getElementById('cartOverlay').addEventListener('click', closeCartModal);
       document.getElementById('checkoutOverlay').addEventListener('click', closeCheckoutModal);
       document.getElementById('historyOverlay').addEventListener('click', closeHistoryModal);
+      document.getElementById('confirmOrderOverlay').addEventListener('click', closeConfirmOrderModal);
       
       // Cart
       document.getElementById('btnHistory').addEventListener('click', openHistoryModal);
@@ -1334,31 +1303,25 @@
       document.getElementById('btnSubmitCheckout').addEventListener('click', submitCheckout);
       document.getElementById('btnCopyOrderId').addEventListener('click', copyOrderId);
       document.getElementById('btnConfirmPayment').addEventListener('click', confirmPayment);
-      document.getElementById('btnOpenLiveChat').addEventListener('click', () => { closeCheckoutModal(); openChatWithOrderInfo(); });
+      document.getElementById('btnOpenLiveChat').addEventListener('click', () => { closeCheckoutModal(); openConfirmOrderModal(); });
       
       // History
       document.getElementById('btnLoadHistory').addEventListener('click', loadHistory);
       
-      // Chat
-      document.getElementById('chatWidgetBtn').addEventListener('click', toggleChat);
-      document.getElementById('closeChatBtn').addEventListener('click', closeChat);
-      document.getElementById('btnBackFromChat').addEventListener('click', closeChat);
-      document.getElementById('sendChatBtn').addEventListener('click', sendChat);
-      document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
-      document.getElementById('openChatFromFooter').addEventListener('click', (e) => { e.preventDefault(); openChat(); });
-      document.getElementById('quickMsgOrder').addEventListener('click', () => { document.getElementById('chatInput').value = 'Saya sudah order, ini bukti transaksinya.'; });
-      
-      // Image upload
-      document.getElementById('imageInput').addEventListener('change', handleImageSelect);
-      document.getElementById('cameraInput').addEventListener('change', handleImageSelect);
-      document.getElementById('removeImage').addEventListener('click', removeImage);
+      // Confirm Order Button & Modal
+      document.getElementById('confirmOrderBtn').addEventListener('click', openConfirmOrderModal);
+      document.getElementById('confirmImageInput').addEventListener('change', handleConfirmImageSelect);
+      document.getElementById('confirmCameraInput').addEventListener('change', handleConfirmImageSelect);
+      document.getElementById('confirmRemoveImage').addEventListener('click', removeConfirmImage);
+      document.getElementById('btnSubmitConfirm').addEventListener('click', submitConfirmation);
+      document.getElementById('openConfirmFromFooter').addEventListener('click', (e) => { e.preventDefault(); openConfirmOrderModal(); });
       
       // Special buttons
-      document.getElementById('btnOpenChatForSaran').addEventListener('click', () => { closeKritikSaranModal(); openChat(); });
+      document.getElementById('btnOpenChatForSaran').addEventListener('click', () => { closeKritikSaranModal(); openConfirmOrderModal(); });
       document.getElementById('btnChatForJoin').addEventListener('click', () => {
         closeJoinJualanModal();
-        openChat();
-        document.getElementById('chatInput').value = 'Saya tertarik untuk join jualan voucher WiFi DOTOPUP. Mohon info lebih lanjut.';
+        const waLink = 'https://wa.me/' + CONFIG.noWhatsappAdmin + '?text=' + encodeURIComponent('Saya tertarik untuk join jualan voucher WiFi DOTOPUP. Mohon info lebih lanjut.');
+        window.open(waLink, '_blank');
       });
     }
 
