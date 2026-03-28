@@ -14,13 +14,18 @@
     .gradient-btn:hover { background: linear-gradient(to right, #059669, #0891b2); }
     .card-hover:hover { border-color: #10b981; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
     
-    .modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    
     .slide-up { animation: slideUp 0.3s ease-out; }
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .hidden { display: none !important; }
+    
+    .is-hidden { display: none !important; }
     
     @keyframes pulse-glow {
       0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
@@ -28,7 +33,7 @@
     }
     .pulse-glow { animation: pulse-glow 2s infinite; }
     
-    /* Dropdown */
+    /* Dropdown Menu */
     .dropdown-menu {
       position: absolute;
       top: 100%;
@@ -40,19 +45,28 @@
       min-width: 220px;
       overflow: hidden;
       z-index: 100;
+      animation: slideUp 0.2s ease-out;
     }
+    
     .dropdown-item {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       padding: 12px 16px;
       cursor: pointer;
       transition: background 0.2s;
-      font-size: 14px;
     }
-    .dropdown-item:hover { background: #f5f5f5; }
-    .dropdown-item svg { width: 18px; height: 18px; color: #6b7280; flex-shrink: 0; }
-    .dropdown-divider { border-top: 1px solid #eee; margin: 4px 0; }
+    
+    .dropdown-item:hover {
+      background: #f5f5f5;
+    }
+    
+    .dropdown-item svg {
+      width: 20px;
+      height: 20px;
+      color: #6b7280;
+      flex-shrink: 0;
+    }
     
     /* Chat Widget */
     .chat-widget-btn {
@@ -70,10 +84,14 @@
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
-      border: none;
     }
-    .chat-widget-btn:hover { transform: scale(1.1); }
     
+    .chat-widget-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(0, 136, 204, 0.5);
+    }
+    
+    /* Chat Window - Full Responsive */
     .chat-window {
       position: fixed;
       bottom: 0;
@@ -83,11 +101,13 @@
       height: 100dvh;
       max-height: 100dvh;
       background: white;
-      z-index: 1000;
+      z-index: 1001;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      animation: slideUp 0.3s ease-out;
     }
+    
     @media (min-width: 640px) {
       .chat-window {
         bottom: 90px;
@@ -97,7 +117,7 @@
         max-height: calc(100dvh - 110px);
         min-height: 500px;
         border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
       }
     }
     
@@ -110,15 +130,24 @@
       gap: 12px;
       flex-shrink: 0;
     }
+    
     .chat-messages {
       flex: 1;
       overflow-y: auto;
       padding: 16px;
       background: #f5f5f5;
+      min-height: 0;
     }
-    .chat-message { margin-bottom: 12px; display: flex; flex-direction: column; }
+    
+    .chat-message {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    
     .chat-message.sent { align-items: flex-end; }
     .chat-message.received { align-items: flex-start; }
+    
     .chat-bubble {
       max-width: 85%;
       padding: 10px 14px;
@@ -127,24 +156,33 @@
       line-height: 1.4;
       word-wrap: break-word;
     }
+    
     .chat-message.sent .chat-bubble {
       background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
       color: white;
       border-bottom-right-radius: 4px;
     }
+    
     .chat-message.received .chat-bubble {
       background: white;
       color: #333;
       border-bottom-left-radius: 4px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
-    .chat-time { font-size: 10px; color: #999; margin-top: 4px; }
+    
+    .chat-time {
+      font-size: 10px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
     .chat-input-area {
       padding: 12px;
       background: white;
       border-top: 1px solid #eee;
       flex-shrink: 0;
     }
+    
     .chat-status {
       display: flex;
       align-items: center;
@@ -154,6 +192,7 @@
       background: rgba(255,255,255,0.2);
       border-radius: 8px;
     }
+    
     .status-dot {
       width: 8px;
       height: 8px;
@@ -161,9 +200,13 @@
       background: #22c55e;
       animation: blink 1.5s infinite;
     }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     
-    /* Image Upload */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Image Upload Styles */
     .image-upload-area {
       border: 2px dashed #ccc;
       border-radius: 12px;
@@ -173,56 +216,27 @@
       transition: all 0.3s;
       background: #fafafa;
     }
-    .image-upload-area:hover { border-color: #0088cc; background: #f0f9ff; }
-    .image-upload-area.has-image { border-style: solid; border-color: #10b981; background: #ecfdf5; }
-    .image-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 8px; }
     
-    /* Camera Modal */
-    .camera-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 1100;
-      background: black;
-      display: flex;
-      flex-direction: column;
-    }
-    .camera-video {
-      flex: 1;
-      object-fit: cover;
-      width: 100%;
-    }
-    .camera-controls {
-      position: absolute;
-      bottom: 20px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px;
-    }
-    .camera-btn {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: white;
-      border: 4px solid rgba(255,255,255,0.3);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .camera-btn.capture { background: white; }
-    .camera-btn.capture::after {
-      content: '';
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: #ef4444;
+    .image-upload-area:hover {
+      border-color: #0088cc;
+      background: #f0f9ff;
     }
     
-    /* Quick buttons */
-    .quick-btn {
+    .image-upload-area.has-image {
+      border-style: solid;
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+    
+    .image-preview {
+      max-width: 100%;
+      max-height: 150px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    
+    /* Quick Message Buttons */
+    .quick-msg-btn {
       padding: 8px 12px;
       background: #e0f2fe;
       border: 1px solid #bae6fd;
@@ -231,22 +245,74 @@
       color: #0369a1;
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
     }
-    .quick-btn:hover { background: #bae6fd; }
+    
+    .quick-msg-btn:hover { background: #bae6fd; }
     
     /* Upload method buttons */
     .upload-method-btn {
       flex: 1;
-      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
       border: 2px solid #e5e7eb;
       border-radius: 12px;
-      background: white;
       cursor: pointer;
       transition: all 0.2s;
-      text-align: center;
+      background: white;
     }
-    .upload-method-btn:hover { border-color: #10b981; background: #ecfdf5; }
-    .upload-method-btn svg { margin: 0 auto 8px; }
+    
+    .upload-method-btn:hover {
+      border-color: #0088cc;
+      background: #f0f9ff;
+    }
+    
+    .upload-method-btn svg {
+      width: 24px;
+      height: 24px;
+      color: #0088cc;
+    }
+    
+    /* Back Button Style */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-back:hover {
+      background: #e5e7eb;
+    }
+    
+    /* Prevent scroll when chat is open */
+    body.chat-open {
+      overflow: hidden;
+    }
+    
+    /* Best Value Badge - Star Icon Only */
+    .best-value-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-radius: 0 12px 0 12px;
+    }
   </style>
 </head>
 <body class="gradient-bg min-h-screen flex flex-col">
@@ -257,25 +323,31 @@
       namaToko: "WIFI CIWATIN",
       noWhatsappAdmin: "6281224940172",
       alamat: "Jl. Ciwatin Raya, Indonesia",
-      qrisDinamis: "https://drive.google.com/file/d/1YfkLZDmNt_VudODS_kPCBjZkDERDwWfQ/view?usp=sharing",
+      qrisDinamis: "https://drive.google.com/uc?export=view&id=YOUR_DYNAMIC_QRIS_ID",
+      
+      // Telegram Bot Configuration
       telegramBotToken: "8658739721:AAFCGFXDWukO8psp-n4wKZFY99HFKiFB3V0",
       telegramChatId: "1616582272",
       
       paket: [
-        { id: "1", nama: "Paket 2 Jam", durasi: "2 Jam", harga: 1000, kecepatan: "Up to 10 Mbps", deskripsi: "Cocok untuk browsing singkat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_1" },
-        { id: "2", nama: "Paket 6 Jam", durasi: "6 Jam", harga: 2000, kecepatan: "Up to 10 Mbps", deskripsi: "Ideal untuk streaming", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_2" },
-        { id: "3", nama: "Paket 12 Jam", durasi: "12 Jam", harga: 3000, kecepatan: "Up to 15 Mbps", deskripsi: "Sempurna untuk work from home", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_3" },
-        { id: "4", nama: "Paket 1 Hari", durasi: "1 Hari", harga: 5000, kecepatan: "Up to 15 Mbps", deskripsi: "Full day internet", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_4" },
-        { id: "5", nama: "Paket 3 Hari", durasi: "3 Hari", harga: 10000, kecepatan: "Up to 20 Mbps", deskripsi: "Paket hemat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_5" },
-        { id: "6", nama: "Paket 1 Minggu", durasi: "7 Hari", harga: 12000, kecepatan: "Up to 20 Mbps", deskripsi: "Weekly premium", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_6" },
-        { id: "7", nama: "Paket 2 Minggu", durasi: "14 Hari", harga: 13000, kecepatan: "Up to 25 Mbps", deskripsi: "Two weeks access", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_7" },
-        { id: "8", nama: "Paket 1 Bulan", durasi: "30 Hari", harga: 25000, kecepatan: "Up to 30 Mbps", deskripsi: "Monthly unlimited", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_8" }
+        // Paket Cepat
+        { id: "1", nama: "Paket 2 Jam", durasi: "2 Jam", harga: 1000, kecepatan: "Unlimited", deskripsi: "Paket Cepat", kategori: "cepat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_1" },
+        { id: "2", nama: "Paket 5 Jam", durasi: "5 Jam", harga: 2000, kecepatan: "Unlimited", deskripsi: "Paket Cepat", kategori: "cepat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_2" },
+        { id: "3", nama: "Paket 12 Jam", durasi: "12 Jam", harga: 3000, kecepatan: "Unlimited", deskripsi: "Paket Cepat", kategori: "cepat", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_3" },
+        // Paket Harian
+        { id: "4", nama: "Paket 1 Hari", durasi: "24 Jam", harga: 4000, kecepatan: "Unlimited", deskripsi: "Paling Laris", kategori: "harian", bestSeller: true, qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_4" },
+        { id: "5", nama: "Paket 2 Hari", durasi: "2 Hari", harga: 5000, kecepatan: "Unlimited", deskripsi: "Paket Harian", kategori: "harian", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_5" },
+        { id: "6", nama: "Paket 3 Hari", durasi: "3 Hari", harga: 7000, kecepatan: "Unlimited", deskripsi: "Paket Harian", kategori: "harian", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_6" },
+        // Paket Mingguan
+        { id: "7", nama: "Paket 6 Hari", durasi: "6 Hari", harga: 13000, kecepatan: "Unlimited", deskripsi: "Paket Mingguan", kategori: "mingguan", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_7" },
+        // Paket Internet Rumah
+        { id: "8", nama: "Paket 1 Bulan", durasi: "1 Bulan", harga: 150000, kecepatan: "Unlimited", deskripsi: "Paket Internet Rumah", kategori: "rumah", qrisImage: "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID_8" }
       ]
     };
   </script>
 
   <!-- Header -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b shadow-sm">
+  <header id="mainHeader" class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b shadow-sm">
     <div class="container mx-auto px-3 sm:px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2 sm:gap-3">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-btn flex items-center justify-center shadow-lg">
@@ -290,69 +362,98 @@
       </div>
       <div class="flex items-center gap-2">
         <!-- Menu Dropdown -->
-        <div class="relative" id="menuContainer">
-          <button id="btnMenu" class="flex items-center gap-1 px-3 py-2 border rounded-lg hover:bg-gray-50 transition">
+        <div class="relative">
+          <button id="btnMenu" class="flex items-center gap-1 sm:gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
             </svg>
           </button>
-          <div id="dropdownMenu" class="dropdown-menu hidden">
+          <div id="dropdownMenu" class="dropdown-menu is-hidden">
             <div id="menuCaraOrder" class="dropdown-item">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+              </svg>
               <span>Cara Order Paket</span>
             </div>
-            <div id="menuOffline" class="dropdown-item">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-              <span>Pembelian Offline</span>
-            </div>
-            <div id="menuJoin" class="dropdown-item">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-              <span>Join Jualan Voucher</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div id="menuKritik" class="dropdown-item">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            <div id="menuKritikSaran" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+              </svg>
               <span>Kritik & Saran</span>
+            </div>
+            <div id="menuInfoOffline" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>Info Pembelian Offline</span>
+            </div>
+            <div id="menuJoinJualan" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>Join Jualan Voucher</span>
             </div>
           </div>
         </div>
         
         <button id="btnHistory" class="flex items-center gap-1 sm:gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
           <span class="hidden sm:inline text-sm">Pesanan</span>
         </button>
         <button id="btnCart" class="relative gradient-btn text-white px-3 py-2 rounded-lg flex items-center gap-1 sm:gap-2 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
           <span class="hidden sm:inline text-sm">Keranjang</span>
-          <span id="cartBadge" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full items-center justify-center hidden">0</span>
+          <span id="cartBadge" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center is-hidden">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Hero -->
+  <!-- Hero Section -->
   <section class="py-6 sm:py-10 px-3 sm:px-4">
     <div class="container mx-auto text-center">
       <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm mb-3 sm:mb-4">
-        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
         Koneksi Super Cepat
       </div>
-      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 px-2">ORDER WIFI DOTOPUP</h2>
-      <p class="text-gray-600 max-w-md mx-auto text-sm sm:text-base px-4">Pilih paket, bayar via QRIS, upload bukti di live chat, tunggu kode dikirim via WhatsApp!</p>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 px-2">
+        ORDER WIFI DOTOPUP
+      </h2>
+      <p class="text-gray-600 max-w-md mx-auto text-sm sm:text-base px-4">
+        Pilih paket, bayar via QRIS, Upload bukti pembayaran di live chat, tunggu kode di kirim via WhatsApp! 
+      </p>
     </div>
   </section>
 
-  <!-- Package Grid -->
+  <!-- Package Categories -->
   <main class="flex-1 px-3 sm:px-4 pb-24 sm:pb-8">
     <div class="container mx-auto">
-      <div id="packageGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"></div>
+      <!-- Kategori Labels -->
+      <div class="mb-4 flex flex-wrap gap-2 justify-center">
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">🔹 Paket Cepat</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">🔹 Paket Harian</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">🔹 Paket Mingguan</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">🏠 Paket Internet Rumah</span>
+      </div>
+      
+      <div id="packageGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+      </div>
     </div>
   </main>
 
-  <!-- Floating Cart -->
-  <div id="floatingCart" class="fixed bottom-4 left-4 right-4 z-40 hidden sm:hidden">
+  <!-- Floating Cart Button (Mobile) -->
+  <div id="floatingCart" class="fixed bottom-4 left-4 right-4 z-40 is-hidden sm:hidden">
     <button id="btnFloatingCart" class="w-full gradient-btn text-white h-12 rounded-xl shadow-lg flex items-center justify-center gap-2">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+      </svg>
       <span>Lihat Keranjang (<span id="floatingCartCount">0</span>) - <span id="floatingCartTotal">Rp 0</span></span>
     </button>
   </div>
@@ -362,137 +463,339 @@
     <div class="container mx-auto px-4 text-center">
       <div class="flex items-center justify-center gap-2 mb-2">
         <div class="w-8 h-8 rounded-xl gradient-btn flex items-center justify-center">
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+          </svg>
         </div>
         <span class="font-semibold" id="footerStoreName">WIFI CIWATIN</span>
       </div>
       <p class="text-gray-400 text-sm mb-3" id="footerAddress">Jl. Ciwatin Raya, Indonesia</p>
-      <div class="flex items-center justify-center gap-4 text-sm mb-4">
-        <a id="whatsappLink" href="#" target="_blank" class="flex items-center gap-2 text-emerald-400 hover:text-emerald-300">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      <div class="flex items-center justify-center gap-4 text-sm">
+        <a id="whatsappLink" href="#" target="_blank" rel="noopener" class="flex items-center gap-2 text-emerald-400 hover:text-emerald-300">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
           WhatsApp
         </a>
         <span class="text-gray-600">|</span>
-        <button id="btnFooterChat" class="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.78.47 3.45 1.29 4.89L2 22l5.11-1.29C8.55 21.53 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        <a href="#" id="openChatFromFooter" class="flex items-center gap-2 text-blue-400 hover:text-blue-300">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.78.47 3.45 1.29 4.89L2 22l5.11-1.29C8.55 21.53 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/>
+          </svg>
           Live Chat
-        </button>
+        </a>
       </div>
-      <p class="text-gray-500 text-xs">Design by Nursidik</p>
-      <p class="text-gray-600 text-xs mt-1" id="copyright"></p>
+      <p class="text-gray-500 text-xs mt-4" id="copyright"></p>
+      <p class="text-gray-600 text-xs mt-2">Design by Nursidik</p>
     </div>
   </footer>
 
-  <!-- ==================== LIVE CHAT ==================== -->
-  <button id="chatWidgetBtn" class="chat-widget-btn" title="Live Chat">
-    <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/><path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/></svg>
-  </button>
+  <!-- ==================== LIVE CHAT WIDGET ==================== -->
   
-  <div id="chatWindow" class="chat-window hidden">
+  <!-- Chat Button -->
+  <div id="chatWidgetBtn" class="chat-widget-btn" title="Live Chat">
+    <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+      <path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+    </svg>
+  </div>
+  
+  <!-- Chat Window -->
+  <div id="chatWindow" class="chat-window is-hidden">
     <div class="chat-header">
+      <button id="btnBackFromChat" class="p-2 hover:bg-white/20 rounded-lg transition flex-shrink-0" title="Kembali">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
       <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.78.47 3.45 1.29 4.89L2 22l5.11-1.29C8.55 21.53 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12c0 1.78.47 3.45 1.29 4.89L2 22l5.11-1.29C8.55 21.53 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/>
+        </svg>
       </div>
       <div class="flex-1 min-w-0">
-        <h4 class="font-semibold text-white text-sm" id="chatTitle">WIFI CIWATIN</h4>
-        <div class="chat-status"><span class="status-dot"></span><span>Online</span></div>
+        <h4 class="font-semibold text-white text-sm" id="chatStoreName">WIFI CIWATIN</h4>
+        <div class="chat-status">
+          <span class="status-dot"></span>
+          <span>Online</span>
+        </div>
       </div>
-      <button id="btnCloseChat" class="p-2 hover:bg-white/20 rounded-lg flex-shrink-0">
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      <button id="closeChatBtn" class="p-2 hover:bg-white/20 rounded-lg transition flex-shrink-0" title="Tutup Chat">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
       </button>
     </div>
     
     <div id="chatMessages" class="chat-messages">
       <div class="chat-message received">
-        <div class="chat-bubble">👋 Halo! Selamat datang di <strong>WIFI CIWATIN</strong><br><br>📱 <strong>Kode voucher akan dikirim via WhatsApp</strong><br>Pastikan nomor WhatsApp aktif!</div>
+        <div class="chat-bubble" id="chatWelcomeMessage">
+          👋 Halo! Selamat datang di <strong>WIFI CIWATIN</strong><br><br>
+          📱 <strong>Kode voucher akan dikirim via WhatsApp</strong><br>
+          Pastikan memasukkan nomor WhatsApp yang aktif!
+        </div>
         <span class="chat-time">Bot</span>
       </div>
     </div>
     
     <div class="chat-input-area">
+      <!-- Quick Message Buttons -->
       <div class="flex flex-wrap gap-2 mb-3">
-        <button id="quickOrder" class="quick-btn">📦 Saya sudah order</button>
+        <button id="quickMsgOrder" class="quick-msg-btn">📦 Saya sudah order</button>
       </div>
       
+      <!-- Phone Input -->
       <div class="mb-2">
-        <label class="block text-xs font-medium text-gray-600 mb-1">📱 Nomor WhatsApp</label>
-        <input type="tel" id="inputPhone" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+        <label class="block text-xs font-medium text-gray-600 mb-1">📱 Nomor WhatsApp (untuk kirim voucher)</label>
+        <input type="tel" id="chatUserPhone" placeholder="Contoh: 08123456789" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
       </div>
       
-      <!-- Upload Methods -->
-      <div class="flex gap-2 mb-2">
-        <button id="btnUploadGallery" class="upload-method-btn">
-          <svg class="w-6 h-6 mx-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <span class="text-xs text-gray-700">📷 Galeri</span>
-        </button>
-        <button id="btnOpenCamera" class="upload-method-btn">
-          <svg class="w-6 h-6 mx-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          <span class="text-xs text-gray-700">📸 Kamera</span>
-        </button>
+      <!-- Image Upload with Camera Option -->
+      <div class="mb-2">
+        <label class="block text-xs font-medium text-gray-600 mb-1">📷 Upload Bukti Transaksi</label>
+        <div class="flex gap-2">
+          <!-- Gallery Upload -->
+          <label class="upload-method-btn">
+            <input type="file" id="imageInput" accept="image/*" class="is-hidden">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </label>
+          <!-- Camera Capture -->
+          <label class="upload-method-btn">
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" class="is-hidden">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </label>
+        </div>
+        
+        <!-- Image Preview -->
+        <div id="imagePreviewContainer" class="is-hidden mt-2 p-2 bg-gray-50 rounded-lg">
+          <img id="imagePreview" class="image-preview mx-auto" alt="Preview">
+          <button id="removeImage" class="w-full mt-2 text-red-500 text-xs hover:underline flex items-center justify-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Hapus
+          </button>
+        </div>
       </div>
       
-      <input type="file" id="inputImage" accept="image/*" class="hidden">
-      
-      <div id="imagePreviewBox" class="hidden mb-2 p-2 bg-gray-50 rounded-lg">
-        <img id="previewImg" class="image-preview" alt="Preview">
-        <p id="previewName" class="text-xs text-gray-600 mt-1"></p>
-        <button id="btnRemoveImage" class="text-red-500 text-xs mt-1 hover:underline">🗑️ Hapus</button>
-      </div>
-      
+      <!-- Message Input -->
       <div class="flex gap-2">
-        <input type="text" id="inputMessage" placeholder="Ketik pesan..." class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-        <button id="btnSendChat" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        <input type="text" id="chatInput" placeholder="Ketik pesan..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <button id="sendChatBtn" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+          </svg>
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- Camera Modal -->
-  <div id="cameraModal" class="camera-modal hidden">
-    <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
-    <canvas id="cameraCanvas" class="hidden"></canvas>
-    <div class="camera-controls">
-      <button id="btnCloseCamera" class="camera-btn" style="background: #6b7280;">
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-      <button id="btnCapture" class="camera-btn capture"></button>
+      
+      <p class="text-xs text-gray-400 mt-2 text-center">Tekan tombol kirim untuk mengirim pesan</p>
     </div>
   </div>
 
   <!-- ==================== MODALS ==================== -->
-  
-  <!-- Info Modal (Generic) -->
-  <div id="infoModal" class="fixed inset-0 z-50 hidden">
-    <div class="modal-overlay absolute inset-0" id="infoOverlay"></div>
+
+  <!-- Cara Order Modal -->
+  <div id="caraOrderModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" id="caraOrderOverlay"></div>
     <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
       <div class="p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 id="infoTitle" class="text-lg font-bold">Info</h3>
-          <button id="btnCloseInfo" class="p-2 hover:bg-gray-100 rounded-lg">✕</button>
+          <div class="flex items-center gap-2">
+            <button class="btn-back modal-back-btn" data-modal="caraOrderModal">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Kembali
+            </button>
+          </div>
+          <button id="btnCloseCaraOrder" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
-        <div id="infoContent"></div>
+        <h3 class="text-lg font-bold mb-4">📋 Cara Order Paket</h3>
+        <div class="space-y-4">
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+            <div>
+              <h4 class="font-semibold">Pilih Paket</h4>
+              <p class="text-sm text-gray-600">Pilih paket WiFi sesuai kebutuhan dan masukkan ke keranjang</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">2</div>
+            <div>
+              <h4 class="font-semibold">Checkout</h4>
+              <p class="text-sm text-gray-600">Masukkan nomor WhatsApp aktif untuk menerima voucher</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">3</div>
+            <div>
+              <h4 class="font-semibold">Bayar via QRIS</h4>
+              <p class="text-sm text-gray-600">Scan QRIS dan transfer sesuai nominal</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">4</div>
+            <div>
+              <h4 class="font-semibold">Upload Bukti</h4>
+              <p class="text-sm text-gray-600">Upload bukti pembayaran di Live Chat</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">5</div>
+            <div>
+              <h4 class="font-semibold">Terima Voucher</h4>
+              <p class="text-sm text-gray-600">Kode voucher dikirim ke WhatsApp Anda</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 p-3 bg-emerald-50 rounded-lg">
+          <p class="text-sm text-emerald-700">💡 <strong>Tips:</strong> Pastikan nomor WhatsApp yang dimasukkan aktif untuk menerima kode voucher dengan cepat!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kritik Saran Modal -->
+  <div id="kritikSaranModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" id="kritikSaranOverlay"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <button class="btn-back modal-back-btn" data-modal="kritikSaranModal">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Kembali
+            </button>
+          </div>
+          <button id="btnCloseKritikSaran" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">💬 Kritik & Saran</h3>
+        <p class="text-sm text-gray-600 mb-4">Kritik dan saran Anda sangat berharga untuk meningkatkan layanan kami.</p>
+        <button id="btnOpenChatForSaran" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          Kirim via Live Chat
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Offline Modal -->
+  <div id="infoOfflineModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" id="infoOfflineOverlay"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <button class="btn-back modal-back-btn" data-modal="infoOfflineModal">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Kembali
+            </button>
+          </div>
+          <button id="btnCloseInfoOffline" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">📍 Info Pembelian Offline</h3>
+        <div class="bg-orange-50 rounded-lg p-4 mb-4">
+          <p class="text-orange-800 font-medium">🏠 Untuk pembelian voucher offline hanya ada di:</p>
+          <p class="text-orange-700 text-lg font-bold mt-2">Rumah Ipin dan Rani</p>
+        </div>
+        <p class="text-sm text-gray-600">Silakan kunjungi lokasi tersebut untuk pembelian langsung tanpa perlu order online.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Jualan Modal -->
+  <div id="joinJualanModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" id="joinJualanOverlay"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <button class="btn-back modal-back-btn" data-modal="joinJualanModal">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Kembali
+            </button>
+          </div>
+          <button id="btnCloseJoinJualan" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">💰 Join Jualan Voucher</h3>
+        <div class="bg-green-50 rounded-lg p-4 mb-4">
+          <p class="text-green-800">🎉 <strong>Harapan yang belum menikmati internet cepat dotopup silahkan chat admin join jualan voucher yuk!</strong></p>
+        </div>
+        <p class="text-sm text-gray-600 mb-4">Dapatkan penghasilan tambahan dengan menjadi agen voucher WiFi DOTOPUP.</p>
+        <button id="btnChatForJoin" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          Chat Admin untuk Join
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Cart Modal -->
-  <div id="cartModal" class="fixed inset-0 z-50 hidden">
+  <div id="cartModal" class="fixed inset-0 z-50 is-hidden">
     <div class="modal-overlay absolute inset-0" id="cartOverlay"></div>
     <div class="absolute right-0 top-0 bottom-0 w-full sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
       <div class="p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold">🛒 Keranjang</h3>
-          <button id="btnCloseCart" class="p-2 hover:bg-gray-100 rounded-lg">✕</button>
+          <div class="flex items-center gap-2">
+            <button class="btn-back modal-back-btn" data-modal="cartModal">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Kembali
+            </button>
+          </div>
+          <button id="btnCloseCart" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
-        <p id="cartDesc" class="text-sm text-gray-500 mb-4">0 item</p>
+        <h3 class="text-lg font-bold flex items-center gap-2 mb-4">🛒 Keranjang Belanja</h3>
+        <p id="cartDescription" class="text-sm text-gray-500 mb-4">0 item dalam keranjang</p>
         <div id="cartItems" class="space-y-3 mb-4 max-h-64 overflow-y-auto"></div>
-        <div id="cartEmpty" class="py-8 text-center text-gray-500"><p>Keranjang kosong</p></div>
+        <div id="cartEmpty" class="py-8 text-center text-gray-500 is-hidden">
+          <p>Keranjang masih kosong</p>
+          <p class="text-sm">Tambahkan paket untuk melanjutkan</p>
+        </div>
         <div id="cartSummary" class="border-t pt-4 space-y-3">
-          <div class="flex justify-between"><span class="font-semibold">Total</span><span id="cartTotal" class="text-xl font-bold text-emerald-600">Rp 0</span></div>
+          <div class="flex justify-between items-center">
+            <span class="font-semibold">Total</span>
+            <span id="cartTotal" class="text-xl font-bold text-emerald-600">Rp 0</span>
+          </div>
           <div class="flex gap-2">
-            <button id="btnClearCart" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">Hapus</button>
-            <button id="btnCheckout" class="flex-1 gradient-btn text-white px-4 py-2 rounded-lg">Checkout</button>
+            <button id="btnClearCart" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition">Hapus</button>
+            <button id="btnCheckout" class="flex-1 gradient-btn text-white px-4 py-2 rounded-lg transition">Checkout</button>
           </div>
         </div>
       </div>
@@ -500,567 +803,669 @@
   </div>
 
   <!-- Checkout Modal -->
-  <div id="checkoutModal" class="fixed inset-0 z-50 hidden">
+  <div id="checkoutModal" class="fixed inset-0 z-50 is-hidden">
     <div class="modal-overlay absolute inset-0" id="checkoutOverlay"></div>
     <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
       <div class="p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 id="checkoutTitle" class="text-lg font-bold">Checkout</h3>
-          <button id="btnCloseCheckout" class="p-2 hover:bg-gray-100 rounded-lg">✕</button>
+          <div class="flex items-center gap-2">
+            <button class="btn-back checkout-back-btn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Kembali
+            </button>
+          </div>
+          <button id="btnCloseCheckout" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
-        <p id="checkoutDesc" class="text-sm text-gray-500 mb-4">0 item</p>
+        <h3 id="checkoutTitle" class="text-lg font-bold mb-4">Checkout</h3>
+        <p id="checkoutDescription" class="text-sm text-gray-500 mb-4">0 item - Total: Rp 0</p>
         
-        <!-- Step 1 -->
-        <div id="step1" class="space-y-4">
+        <!-- Step 1: Form -->
+        <div id="checkoutStep1" class="space-y-4">
           <div id="orderSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 max-h-32 overflow-y-auto text-sm"></div>
           <div>
-            <label class="block text-sm font-medium mb-1">Nomor WhatsApp</label>
-            <input type="tel" id="inputWa" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+            <label class="block text-sm font-medium mb-1">Nomor WhatsApp / Telepon</label>
+            <input type="tel" id="inputWhatsapp" placeholder="Contoh: 08123456789" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <p class="text-xs text-gray-500 mt-1">Untuk menerima kode voucher</p>
           </div>
-          <button id="btnSubmitCheckout" class="w-full gradient-btn text-white py-3 rounded-lg">💳 Lanjut ke Pembayaran</button>
+          <button id="btnSubmitCheckout" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+            💳 Lanjut ke Pembayaran
+          </button>
         </div>
         
-        <!-- Step 2 -->
-        <div id="step2" class="space-y-4 hidden">
-          <div class="bg-blue-50 rounded-lg p-3 flex justify-between items-center">
-            <div><p class="text-xs text-gray-500">ID Pesanan</p><p id="orderId" class="font-mono font-semibold text-sm">WFI-XXX</p></div>
-            <button id="btnCopyId" class="p-2 hover:bg-blue-100 rounded-lg">📋</button>
+        <!-- Step 2: Payment -->
+        <div id="checkoutStep2" class="space-y-4 is-hidden">
+          <div class="bg-blue-50 rounded-lg p-3 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-500">ID Pesanan</p>
+              <p id="orderIdDisplay" class="font-mono font-semibold text-sm">WFI-XXX</p>
+            </div>
+            <button id="btnCopyOrderId" class="p-2 hover:bg-blue-100 rounded-lg">📋</button>
           </div>
           <div id="qrisInfo" class="text-center"></div>
-          <div class="flex justify-center"><div class="bg-white p-3 rounded-xl shadow border"><img id="qrisImg" src="" alt="QRIS" class="w-56 h-56 object-contain"></div></div>
-          <p class="text-center text-lg font-bold text-emerald-600">Transfer: <span id="payTotal">Rp 0</span></p>
-          <button id="btnConfirmPay" class="w-full gradient-btn text-white py-3 rounded-lg pulse-glow">✅ Saya Sudah Bayar</button>
+          <div class="flex justify-center">
+            <div class="bg-white p-3 rounded-xl shadow-lg border">
+              <img id="qrisImage" src="" alt="QRIS Payment" class="w-56 h-56 sm:w-64 sm:h-64 object-contain">
+            </div>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-emerald-600">Transfer: <span id="paymentTotal">Rp 0</span></p>
+          </div>
+          <button id="btnConfirmPayment" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2 pulse-glow">
+            ✅ Saya Sudah Bayar
+          </button>
         </div>
         
-        <!-- Step 3 -->
-        <div id="step3" class="space-y-4 hidden">
+        <!-- Step 3: Upload Bukti -->
+        <div id="checkoutStep3" class="space-y-4 is-hidden">
           <div class="bg-green-50 rounded-lg p-4 text-center">
             <p class="text-2xl mb-2">✅</p>
             <p class="font-semibold text-green-700">Pembayaran Dikonfirmasi!</p>
-            <p class="text-sm text-gray-600 mt-1">Upload bukti pembayaran untuk mendapatkan voucher</p>
+            <p class="text-sm text-gray-600 mt-1">Upload bukti pembayaran untuk mendapatkan kode voucher</p>
           </div>
-          <div id="finalSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 text-sm"></div>
-          <button id="btnOpenLiveChat" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          <div id="finalOrderSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 text-sm"></div>
+          
+          <!-- UBAH: Tombol buka Live Chat -->
+          <button id="btnOpenLiveChat" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
             📷 Upload Bukti di Live Chat
           </button>
+          
+          <p class="text-xs text-center text-gray-500">Kode voucher akan dikirim ke WhatsApp setelah verifikasi</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- History Modal -->
-  <div id="historyModal" class="fixed inset-0 z-50 hidden">
+  <div id="historyModal" class="fixed inset-0 z-50 is-hidden">
     <div class="modal-overlay absolute inset-0" id="historyOverlay"></div>
     <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
       <div class="p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold">📋 Riwayat Pesanan</h3>
+          <div class="flex items-center gap-2">
+            <button class="btn-back modal-back-btn" data-modal="historyModal">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Kembali
+            </button>
+          </div>
           <button id="btnCloseHistory" class="p-2 hover:bg-gray-100 rounded-lg">✕</button>
         </div>
+        <h3 class="text-lg font-bold mb-4">📋 Riwayat Pesanan</h3>
+        <p class="text-sm text-gray-500 mb-4">Masukkan nomor WhatsApp untuk melihat pesanan</p>
         <div class="flex gap-2 mb-4">
-          <input type="tel" id="inputHistoryPhone" placeholder="Nomor WhatsApp" class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
-          <button id="btnSearchHistory" class="px-4 py-2 gradient-btn text-white rounded-lg">Cari</button>
+          <input type="tel" id="historyPhone" placeholder="Nomor WhatsApp (08xxx)" class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <button id="btnLoadHistory" class="px-4 py-2 gradient-btn text-white rounded-lg">Cari</button>
         </div>
         <div id="historyList" class="space-y-3 max-h-96 overflow-y-auto"></div>
+        <div id="historyEmpty" class="py-8 text-center text-gray-500">
+          <p>Masukkan nomor WhatsApp untuk melihat pesanan</p>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="fixed bottom-20 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 z-[60]">
-    <p id="toastMsg">Message</p>
+  <div id="toast" class="fixed bottom-20 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 z-[1100]">
+    <p id="toastMessage">Message</p>
   </div>
 
-  <!-- ==================== SCRIPT ==================== -->
+  <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // State
     let cart = [];
     let currentOrder = null;
-    let chatHistory = [];
+    let currentCheckoutStep = 1;
+    let chatMessages = [];
+    let chatUserInfo = null;
+    let selectedImage = null;
     let selectedImageBase64 = null;
-    let cameraStream = null;
+    const elements = {};
 
-    // Utils
-    const formatRupiah = (n) => new Intl.NumberFormat('id-ID', {style:'currency',currency:'IDR',minimumFractionDigits:0}).format(n);
-    const genId = () => 'WFI-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,6).toUpperCase();
-    const formatDate = (ts) => new Date(ts).toLocaleString('id-ID', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    const formatTime = (ts) => new Date(ts).toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
-    const escapeHtml = (t) => { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
-    
-    function showToast(msg) {
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    }
+
+    function generateOrderId() {
+      return 'WFI-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    }
+
+    function getStorageKey(phone) { return 'wifi_orders_' + phone.replace(/\D/g, ''); }
+
+    function showToast(message) {
       const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').textContent = msg;
+      document.getElementById('toastMessage').textContent = message;
       toast.classList.remove('translate-y-full', 'opacity-0');
       setTimeout(() => toast.classList.add('translate-y-full', 'opacity-0'), 3000);
     }
 
-    function saveLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
-    function loadLocal(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
+    function formatDate(ts) {
+      return new Date(ts).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatTime(ts) {
+      return new Date(ts).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function cleanExpiredOrders(phone) {
+      try {
+        const stored = localStorage.getItem(getStorageKey(phone));
+        if (!stored) return [];
+        const orders = JSON.parse(stored);
+        return orders.filter(o => o.expiresAt > Date.now());
+      } catch { return []; }
+    }
+
+    function safeLocalStorage(action, key, value) {
+      try {
+        if (action === 'get') { const item = localStorage.getItem(key); return item ? JSON.parse(item) : null; }
+        else if (action === 'set') { localStorage.setItem(key, JSON.stringify(value)); return true; }
+      } catch { return null; }
+    }
 
     // Telegram
-    async function sendTelegram(msg, img64) {
+    async function sendTelegramMessage(message, imageBase64) {
       const token = CONFIG.telegramBotToken;
       const chatId = CONFIG.telegramChatId;
       try {
-        if (img64) {
-          const fd = new FormData();
-          fd.append('chat_id', chatId);
-          fd.append('caption', msg);
-          fd.append('parse_mode', 'HTML');
-          const b64 = img64.split(',')[1];
-          const bytes = atob(b64);
-          const arr = new Uint8Array([...Array(bytes.length)].map((_,i) => bytes.charCodeAt(i)));
-          fd.append('photo', new Blob([arr], {type:'image/jpeg'}), 'bukti.jpg');
-          const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {method:'POST', body:fd});
+        if (imageBase64) {
+          const formData = new FormData();
+          formData.append('chat_id', chatId);
+          formData.append('caption', message);
+          formData.append('parse_mode', 'HTML');
+          const base64Data = imageBase64.split(',')[1];
+          const byteCharacters = atob(base64Data);
+          const byteArray = new Uint8Array([...Array(byteCharacters.length)].map((_, i) => byteCharacters.charCodeAt(i)));
+          formData.append('photo', new Blob([byteArray], { type: 'image/jpeg' }), 'bukti_transaksi.jpg');
+          const res = await fetch('https://api.telegram.org/bot' + token + '/sendPhoto', { method: 'POST', body: formData });
           return await res.json();
         } else {
-          const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-            method:'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({chat_id:chatId, text:msg, parse_mode:'HTML'})
+          const res = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
           });
           return await res.json();
         }
-      } catch(e) { return {ok:false, error:e.message}; }
+      } catch (e) { return { ok: false, error: e.message }; }
     }
 
-    // Init
     function init() {
       document.getElementById('storeName').textContent = CONFIG.namaToko;
       document.getElementById('footerStoreName').textContent = CONFIG.namaToko;
       document.getElementById('footerAddress').textContent = CONFIG.alamat;
       document.getElementById('copyright').textContent = '© ' + new Date().getFullYear() + ' ' + CONFIG.namaToko;
       document.getElementById('whatsappLink').href = 'https://wa.me/' + CONFIG.noWhatsappAdmin;
-      document.getElementById('chatTitle').textContent = CONFIG.namaToko;
+      document.getElementById('chatStoreName').textContent = CONFIG.namaToko;
       
-      cart = loadLocal('wifi_cart') || [];
-      chatHistory = loadLocal('wifi_chat') || [];
-      
+      const savedCart = safeLocalStorage('get', 'wifi_cart');
+      if (savedCart) cart = savedCart;
+      loadChatHistory();
       renderPackages();
       updateCartUI();
-      setupEvents();
+      setupEventListeners();
     }
 
-    function setupEvents() {
-      // Menu
-      document.getElementById('btnMenu').onclick = (e) => {
+    function setupEventListeners() {
+      // Menu dropdown
+      document.getElementById('btnMenu').addEventListener('click', (e) => {
         e.stopPropagation();
-        document.getElementById('dropdownMenu').classList.toggle('hidden');
-      };
-      document.onclick = () => document.getElementById('dropdownMenu').classList.add('hidden');
+        document.getElementById('dropdownMenu').classList.toggle('is-hidden');
+      });
+      document.addEventListener('click', () => document.getElementById('dropdownMenu').classList.add('is-hidden'));
       
-      document.getElementById('menuCaraOrder').onclick = () => showCaraOrder();
-      document.getElementById('menuOffline').onclick = () => showOffline();
-      document.getElementById('menuJoin').onclick = () => showJoin();
-      document.getElementById('menuKritik').onclick = () => {
-        document.getElementById('dropdownMenu').classList.add('hidden');
+      document.getElementById('menuCaraOrder').addEventListener('click', () => {
+        document.getElementById('dropdownMenu').classList.add('is-hidden');
+        openCaraOrderModal();
+      });
+      document.getElementById('menuKritikSaran').addEventListener('click', () => {
+        document.getElementById('dropdownMenu').classList.add('is-hidden');
+        openKritikSaranModal();
+      });
+      document.getElementById('menuInfoOffline').addEventListener('click', () => {
+        document.getElementById('dropdownMenu').classList.add('is-hidden');
+        openInfoOfflineModal();
+      });
+      document.getElementById('menuJoinJualan').addEventListener('click', () => {
+        document.getElementById('dropdownMenu').classList.add('is-hidden');
+        openJoinJualanModal();
+      });
+      
+      // Modal back buttons
+      document.querySelectorAll('.modal-back-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const modalId = this.dataset.modal;
+          if (modalId) {
+            document.getElementById(modalId).classList.add('is-hidden');
+            document.body.style.overflow = '';
+          }
+        });
+      });
+      
+      // Checkout back button (special handling)
+      document.querySelector('.checkout-back-btn').addEventListener('click', function() {
+        if (currentCheckoutStep > 1) {
+          currentCheckoutStep--;
+          showCheckoutStep(currentCheckoutStep);
+        } else {
+          closeCheckoutModal();
+          openCartModal();
+        }
+      });
+      
+      // Info Offline Modal
+      document.getElementById('infoOfflineOverlay').addEventListener('click', closeInfoOfflineModal);
+      document.getElementById('btnCloseInfoOffline').addEventListener('click', closeInfoOfflineModal);
+      
+      // Join Jualan Modal
+      document.getElementById('joinJualanOverlay').addEventListener('click', closeJoinJualanModal);
+      document.getElementById('btnCloseJoinJualan').addEventListener('click', closeJoinJualanModal);
+      document.getElementById('btnChatForJoin').addEventListener('click', () => {
+        closeJoinJualanModal();
         openChat();
-        document.getElementById('inputMessage').value = 'Kritik & Saran: ';
-      };
+        document.getElementById('chatInput').value = 'Saya tertarik untuk join jualan voucher WiFi DOTOPUP. Mohon info lebih lanjut.';
+      });
       
-      // Header buttons
-      document.getElementById('btnHistory').onclick = () => {
-        document.getElementById('historyModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-      };
-      document.getElementById('btnCart').onclick = () => {
-        document.getElementById('cartModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        renderCartItems();
-      };
-      document.getElementById('btnFloatingCart').onclick = () => {
-        document.getElementById('cartModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        renderCartItems();
-      };
+      // Modals
+      document.getElementById('btnHistory').addEventListener('click', openHistoryModal);
+      document.getElementById('btnCart').addEventListener('click', openCartModal);
+      document.getElementById('btnFloatingCart')?.addEventListener('click', openCartModal);
+      document.getElementById('cartOverlay').addEventListener('click', closeCartModal);
+      document.getElementById('btnCloseCart').addEventListener('click', closeCartModal);
+      document.getElementById('btnClearCart').addEventListener('click', clearCart);
+      document.getElementById('btnCheckout').addEventListener('click', proceedToCheckout);
       
-      // Cart modal
-      document.getElementById('cartOverlay').onclick = () => closeCartModal();
-      document.getElementById('btnCloseCart').onclick = () => closeCartModal();
-      document.getElementById('btnClearCart').onclick = () => { cart = []; saveCart(); updateCartUI(); renderCartItems(); showToast('Dihapus'); };
-      document.getElementById('btnCheckout').onclick = () => { if(!cart.length) return showToast('Keranjang kosong'); closeCartModal(); openCheckout(); };
+      document.getElementById('checkoutOverlay').addEventListener('click', closeCheckoutModal);
+      document.getElementById('btnCloseCheckout').addEventListener('click', closeCheckoutModal);
+      document.getElementById('btnSubmitCheckout').addEventListener('click', submitCheckout);
+      document.getElementById('btnCopyOrderId').addEventListener('click', copyOrderId);
+      document.getElementById('btnConfirmPayment').addEventListener('click', confirmPayment);
       
-      // Checkout modal
-      document.getElementById('checkoutOverlay').onclick = () => closeCheckoutModal();
-      document.getElementById('btnCloseCheckout').onclick = () => closeCheckoutModal();
-      document.getElementById('btnSubmitCheckout').onclick = () => submitCheckout();
-      document.getElementById('btnCopyId').onclick = () => { navigator.clipboard.writeText(currentOrder.id); showToast('ID disalin'); };
-      document.getElementById('btnConfirmPay').onclick = () => confirmPay();
-      document.getElementById('btnOpenLiveChat').onclick = () => { closeCheckoutModal(); openChatWithOrder(); };
+      // UBAH: Buka live chat instead of WhatsApp
+      document.getElementById('btnOpenLiveChat').addEventListener('click', () => {
+        closeCheckoutModal();
+        openChatWithOrderInfo();
+      });
       
-      // History modal
-      document.getElementById('historyOverlay').onclick = () => closeHistoryModal();
-      document.getElementById('btnCloseHistory').onclick = () => closeHistoryModal();
-      document.getElementById('btnSearchHistory').onclick = () => loadHistory();
+      document.getElementById('historyOverlay').addEventListener('click', closeHistoryModal);
+      document.getElementById('btnCloseHistory').addEventListener('click', closeHistoryModal);
+      document.getElementById('btnLoadHistory').addEventListener('click', loadHistory);
       
-      // Info modal
-      document.getElementById('infoOverlay').onclick = () => closeInfoModal();
-      document.getElementById('btnCloseInfo').onclick = () => closeInfoModal();
+      document.getElementById('caraOrderOverlay').addEventListener('click', closeCaraOrderModal);
+      document.getElementById('btnCloseCaraOrder').addEventListener('click', closeCaraOrderModal);
+      document.getElementById('kritikSaranOverlay').addEventListener('click', closeKritikSaranModal);
+      document.getElementById('btnCloseKritikSaran').addEventListener('click', closeKritikSaranModal);
+      document.getElementById('btnOpenChatForSaran').addEventListener('click', () => {
+        closeKritikSaranModal();
+        openChat();
+      });
       
       // Chat
-      document.getElementById('chatWidgetBtn').onclick = () => openChat();
-      document.getElementById('btnFooterChat').onclick = () => openChat();
-      document.getElementById('btnCloseChat').onclick = () => closeChat();
-      document.getElementById('quickOrder').onclick = () => { document.getElementById('inputMessage').value = 'Saya sudah order, ini bukti transaksinya.'; };
-      document.getElementById('btnSendChat').onclick = () => sendChat();
-      document.getElementById('inputMessage').onkeypress = (e) => { if(e.key==='Enter') sendChat(); };
+      document.getElementById('chatWidgetBtn').addEventListener('click', toggleChat);
+      document.getElementById('closeChatBtn').addEventListener('click', closeChat);
+      document.getElementById('btnBackFromChat').addEventListener('click', closeChat);
+      document.getElementById('sendChatBtn').addEventListener('click', sendChat);
+      document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
+      document.getElementById('openChatFromFooter').addEventListener('click', (e) => { e.preventDefault(); openChat(); });
+      document.getElementById('quickMsgOrder').addEventListener('click', () => {
+        document.getElementById('chatInput').value = 'Saya sudah order, ini bukti transaksinya.';
+      });
       
-      // Image upload
-      document.getElementById('btnUploadGallery').onclick = () => document.getElementById('inputImage').click();
-      document.getElementById('inputImage').onchange = (e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        if(!file.type.startsWith('image/')) return showToast('Pilih gambar');
-        if(file.size > 5*1024*1024) return showToast('Max 5MB');
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          selectedImageBase64 = ev.target.result;
-          document.getElementById('previewImg').src = selectedImageBase64;
-          document.getElementById('previewName').textContent = file.name;
-          document.getElementById('imagePreviewBox').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      };
-      document.getElementById('btnRemoveImage').onclick = () => {
-        selectedImageBase64 = null;
-        document.getElementById('imagePreviewBox').classList.add('hidden');
-        document.getElementById('inputImage').value = '';
-      };
-      
-      // Camera
-      document.getElementById('btnOpenCamera').onclick = () => openCamera();
-      document.getElementById('btnCloseCamera').onclick = () => closeCamera();
-      document.getElementById('btnCapture').onclick = () => capturePhoto();
+      // Image upload - Gallery
+      document.getElementById('imageInput').addEventListener('change', handleImageSelect);
+      // Image upload - Camera
+      document.getElementById('cameraInput').addEventListener('change', handleImageSelect);
+      document.getElementById('removeImage').addEventListener('click', removeImage);
     }
 
-    // Modal functions
-    function closeCartModal() { document.getElementById('cartModal').classList.add('hidden'); document.body.style.overflow = ''; }
-    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); document.body.style.overflow = ''; showStep(1); }
-    function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); document.body.style.overflow = ''; }
-    function closeInfoModal() { document.getElementById('infoModal').classList.add('hidden'); document.body.style.overflow = ''; }
-    
-    function showInfoModal(title, content) {
-      document.getElementById('infoTitle').textContent = title;
-      document.getElementById('infoContent').innerHTML = content;
-      document.getElementById('infoModal').classList.remove('hidden');
+    function openCaraOrderModal() {
+      document.getElementById('caraOrderModal').classList.remove('is-hidden');
       document.body.style.overflow = 'hidden';
     }
-    
-    function showCaraOrder() {
-      document.getElementById('dropdownMenu').classList.add('hidden');
-      showInfoModal('📋 Cara Order Paket', `
-        <div class="space-y-4">
-          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">1</div><div><h4 class="font-semibold">Pilih Paket</h4><p class="text-sm text-gray-600">Pilih paket WiFi dan masukkan ke keranjang</p></div></div>
-          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">2</div><div><h4 class="font-semibold">Checkout</h4><p class="text-sm text-gray-600">Masukkan nomor WhatsApp aktif</p></div></div>
-          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">3</div><div><h4 class="font-semibold">Bayar QRIS</h4><p class="text-sm text-gray-600">Scan QRIS dan transfer sesuai nominal</p></div></div>
-          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">4</div><div><h4 class="font-semibold">Upload Bukti</h4><p class="text-sm text-gray-600">Upload bukti di Live Chat (galeri/kamera)</p></div></div>
-          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">5</div><div><h4 class="font-semibold">Terima Voucher</h4><p class="text-sm text-gray-600">Kode voucher dikirim ke WhatsApp</p></div></div>
-        </div>
-      `);
+    function closeCaraOrderModal() {
+      document.getElementById('caraOrderModal').classList.add('is-hidden');
+      document.body.style.overflow = '';
     }
-    
-    function showOffline() {
-      document.getElementById('dropdownMenu').classList.add('hidden');
-      showInfoModal('📍 Pembelian Offline', `
-        <div class="text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center">
-            <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          </div>
-          <h4 class="font-bold text-lg mb-2">Pembelian Voucher Offline</h4>
-          <p class="text-gray-600 mb-4">Tersedia di lokasi berikut:</p>
-          <div class="bg-gray-50 rounded-lg p-4 space-y-3">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">🏠</span>
-              <div class="text-left"><p class="font-semibold">Rumah Ipin</p><p class="text-sm text-gray-500">Jl. Ciwatin Raya</p></div>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">🏠</span>
-              <div class="text-left"><p class="font-semibold">Rumah Rani</p><p class="text-sm text-gray-500">Jl. Ciwatin Raya</p></div>
-            </div>
-          </div>
-        </div>
-      `);
+    function openKritikSaranModal() {
+      document.getElementById('kritikSaranModal').classList.remove('is-hidden');
+      document.body.style.overflow = 'hidden';
     }
-    
-    function showJoin() {
-      document.getElementById('dropdownMenu').classList.add('hidden');
-      showInfoModal('💼 Join Jualan Voucher', `
-        <div class="text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-          </div>
-          <h4 class="font-bold text-lg mb-2">Belum Menikmati Internet Cepat DOTOPUP?</h4>
-          <p class="text-gray-600 mb-4">Mau jadi agen jualan voucher WiFi? Dapat penghasilan tambahan!</p>
-          <button id="btnChatJoin" class="w-full gradient-btn text-white py-3 rounded-lg" onclick="closeInfoModal(); openChat(); document.getElementById('inputMessage').value='Saya mau join jualan voucher WiFi DOTOPUP!';">💬 Chat Admin Sekarang</button>
-        </div>
-      `);
+    function closeKritikSaranModal() {
+      document.getElementById('kritikSaranModal').classList.add('is-hidden');
+      document.body.style.overflow = '';
+    }
+    function openInfoOfflineModal() {
+      document.getElementById('infoOfflineModal').classList.remove('is-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeInfoOfflineModal() {
+      document.getElementById('infoOfflineModal').classList.add('is-hidden');
+      document.body.style.overflow = '';
+    }
+    function openJoinJualanModal() {
+      document.getElementById('joinJualanModal').classList.remove('is-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeJoinJualanModal() {
+      document.getElementById('joinJualanModal').classList.add('is-hidden');
+      document.body.style.overflow = '';
     }
 
-    // Cart
-    function saveCart() { saveLocal('wifi_cart', cart); }
-    
+    function handleImageSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showToast('Pilih file gambar'); return; }
+      if (file.size > 5 * 1024 * 1024) { showToast('Maksimal 5MB'); return; }
+      
+      selectedImage = file;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        selectedImageBase64 = ev.target.result;
+        document.getElementById('imagePreview').src = selectedImageBase64;
+        document.getElementById('imagePreviewContainer').classList.remove('is-hidden');
+      };
+      reader.readAsDataURL(file);
+      showToast('Gambar dipilih');
+    }
+
+    function removeImage() {
+      selectedImage = null; selectedImageBase64 = null;
+      document.getElementById('imagePreviewContainer').classList.add('is-hidden');
+      document.getElementById('imageInput').value = '';
+      document.getElementById('cameraInput').value = '';
+    }
+
+    function renderPackages() {
+      const grid = document.getElementById('packageGrid');
+      grid.innerHTML = CONFIG.paket.map((p, i) => {
+        // Determine badge
+        let badgeHtml = '';
+        if (p.bestSeller) {
+          badgeHtml = '<div class="best-value-badge" title="Paling Laris">⭐</div>';
+        }
+        
+        // Determine category styling
+        let categoryStyle = '';
+        if (p.kategori === 'rumah') {
+          categoryStyle = 'bg-gradient-to-b from-orange-50 to-white';
+        } else if (p.kategori === 'mingguan') {
+          categoryStyle = 'bg-gradient-to-b from-purple-50 to-white';
+        }
+        
+        return `
+        <div class="relative overflow-hidden border-2 border-transparent card-hover rounded-xl bg-white transition-all duration-300 group ${categoryStyle}">
+          ${badgeHtml}
+          <div class="p-3 sm:p-4">
+            <div class="flex items-center gap-2 sm:gap-3 mb-3">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-btn flex items-center justify-center shadow group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-base leading-tight">${p.nama}</h3>
+                <p class="text-xs text-gray-500">⚡ ${p.kecepatan}</p>
+              </div>
+            </div>
+            <div class="text-center mb-3">
+              <p class="text-xl sm:text-2xl font-bold text-emerald-600">${formatRupiah(p.harga)}</p>
+              <p class="text-xs sm:text-sm text-gray-500">${p.durasi}</p>
+            </div>
+            <button data-paket-id="${p.id}" class="btn-add-cart w-full gradient-btn text-white py-2 rounded-lg text-sm flex items-center justify-center gap-1 transition">+ Tambah</button>
+          </div>
+        </div>
+      `}).join('');
+      
+      grid.querySelectorAll('.btn-add-cart').forEach(btn => {
+        btn.addEventListener('click', function() { addToCart(this.dataset.paketId); });
+      });
+    }
+
+    function addToCart(id) {
+      const paket = CONFIG.paket.find(p => p.id === id);
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.quantity++;
+      else cart.push({ ...paket, quantity: 1 });
+      saveCart(); updateCartUI();
+      showToast(paket.nama + ' ditambahkan');
+    }
+
+    function removeFromCart(id) { cart = cart.filter(i => i.id !== id); saveCart(); updateCartUI(); renderCartItems(); }
+    function updateQuantity(id, d) {
+      const item = cart.find(i => i.id === id);
+      if (item) { item.quantity += d; if (item.quantity <= 0) { removeFromCart(id); return; } saveCart(); updateCartUI(); renderCartItems(); }
+    }
+    function clearCart() { cart = []; saveCart(); updateCartUI(); renderCartItems(); showToast('Keranjang dikosongkan'); }
+    function saveCart() { safeLocalStorage('set', 'wifi_cart', cart); }
+
     function updateCartUI() {
       let count = 0, total = 0;
-      cart.forEach(i => { count += i.qty; total += i.harga * i.qty; });
-      
+      cart.forEach(i => { count += i.quantity; total += i.harga * i.quantity; });
       const badge = document.getElementById('cartBadge');
-      if(count > 0) { badge.textContent = count; badge.classList.remove('hidden'); badge.style.display = 'flex'; }
-      else badge.classList.add('hidden');
+      if (count > 0) { badge.textContent = count; badge.classList.remove('is-hidden'); }
+      else badge.classList.add('is-hidden');
       
       const floating = document.getElementById('floatingCart');
-      if(count > 0) { floating.classList.remove('hidden'); document.getElementById('floatingCartCount').textContent = count; document.getElementById('floatingCartTotal').textContent = formatRupiah(total); }
-      else floating.classList.add('hidden');
+      if (count > 0) { floating.classList.remove('is-hidden'); document.getElementById('floatingCartCount').textContent = count; document.getElementById('floatingCartTotal').textContent = formatRupiah(total); }
+      else floating.classList.add('is-hidden');
       
-      document.getElementById('cartDesc').textContent = count > 0 ? count + ' item' : '0 item';
+      document.getElementById('cartDescription').textContent = count > 0 ? count + ' item' : 'Keranjang kosong';
       document.getElementById('cartTotal').textContent = formatRupiah(total);
     }
-    
+
     function renderCartItems() {
       const container = document.getElementById('cartItems');
-      if(!cart.length) { container.innerHTML = ''; document.getElementById('cartEmpty').classList.remove('hidden'); document.getElementById('cartSummary').classList.add('hidden'); return; }
-      document.getElementById('cartEmpty').classList.add('hidden');
-      document.getElementById('cartSummary').classList.remove('hidden');
+      if (cart.length === 0) { container.innerHTML = ''; document.getElementById('cartEmpty').classList.remove('is-hidden'); document.getElementById('cartSummary').classList.add('is-hidden'); return; }
+      document.getElementById('cartEmpty').classList.add('is-hidden');
+      document.getElementById('cartSummary').classList.remove('is-hidden');
       
-      container.innerHTML = cart.map((item, idx) => `
+      container.innerHTML = cart.map(item => `
         <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
           <div class="flex-1 min-w-0"><p class="font-medium text-sm truncate">${item.nama}</p><p class="text-xs text-gray-500">${formatRupiah(item.harga)}</p></div>
           <div class="flex items-center gap-1">
-            <button onclick="updateQty(${idx},-1)" class="w-7 h-7 border rounded hover:bg-gray-100">−</button>
-            <span class="w-8 text-center text-sm">${item.qty}</span>
-            <button onclick="updateQty(${idx},1)" class="w-7 h-7 border rounded hover:bg-gray-100">+</button>
+            <button data-id="${item.id}" data-d="-1" class="btn-qty w-7 h-7 border rounded hover:bg-gray-100">−</button>
+            <span class="w-8 text-center text-sm">${item.quantity}</span>
+            <button data-id="${item.id}" data-d="1" class="btn-qty w-7 h-7 border rounded hover:bg-gray-100">+</button>
           </div>
-          <button onclick="removeItem(${idx})" class="w-8 h-8 text-red-500 hover:bg-red-50 rounded text-sm">🗑</button>
+          <button data-id="${item.id}" class="btn-rm w-8 h-8 text-red-500 hover:bg-red-50 rounded">🗑</button>
         </div>
       `).join('');
+      
+      container.querySelectorAll('.btn-qty').forEach(b => b.addEventListener('click', function() { updateQuantity(this.dataset.id, parseInt(this.dataset.d)); }));
+      container.querySelectorAll('.btn-rm').forEach(b => b.addEventListener('click', function() { removeFromCart(this.dataset.id); }));
     }
-    
-    window.updateQty = (idx, d) => {
-      cart[idx].qty += d;
-      if(cart[idx].qty <= 0) cart.splice(idx, 1);
-      saveCart(); updateCartUI(); renderCartItems();
-    };
-    
-    window.removeItem = (idx) => { cart.splice(idx, 1); saveCart(); updateCartUI(); renderCartItems(); };
 
-    // Packages
-    function renderPackages() {
-      const grid = document.getElementById('packageGrid');
-      grid.innerHTML = CONFIG.paket.map((p, i) => `
-        <div class="relative overflow-hidden border-2 border-transparent card-hover rounded-xl bg-white transition-all duration-300 ${i >= 4 ? 'bg-gradient-to-b from-amber-50 to-white' : ''}">
-          ${i >= 4 ? '<div class="absolute top-0 right-0"><span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs px-2 py-1 rounded-bl-lg rounded-tr-lg">Best Value</span></div>' : ''}
-          <div class="p-3 sm:p-4">
-            <div class="flex items-center gap-2 mb-3">
-              <div class="w-10 h-10 rounded-xl gradient-btn flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-              <div class="flex-1 min-w-0"><h3 class="font-semibold text-sm sm:text-lg leading-tight">${p.nama}</h3><p class="text-xs text-gray-500">⚡ ${p.kecepatan}</p></div>
-            </div>
-            <div class="text-center mb-3"><p class="text-xl font-bold text-emerald-600">${formatRupiah(p.harga)}</p><p class="text-xs text-gray-500">${p.durasi}</p></div>
-            <button onclick="addPaket('${p.id}')" class="w-full gradient-btn text-white py-2 rounded-lg text-sm">+ Tambah</button>
-          </div>
-        </div>
-      `).join('');
-    }
-    
-    window.addPaket = (id) => {
-      const p = CONFIG.paket.find(x => x.id === id);
-      const exist = cart.find(x => x.id === id);
-      if(exist) exist.qty++;
-      else cart.push({...p, qty:1});
-      saveCart(); updateCartUI();
-      showToast(p.nama + ' ditambahkan');
-    };
+    function openCartModal() { document.getElementById('cartModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; renderCartItems(); }
+    function closeCartModal() { document.getElementById('cartModal').classList.add('is-hidden'); document.body.style.overflow = ''; }
+    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('is-hidden'); document.body.style.overflow = ''; currentCheckoutStep = 1; showCheckoutStep(1); }
+    function openHistoryModal() { document.getElementById('historyModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; document.getElementById('historyList').innerHTML = ''; }
 
-    // Checkout
-    function openCheckout() {
-      document.getElementById('checkoutModal').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-      showStep(1);
+    function proceedToCheckout() {
+      if (cart.length === 0) { showToast('Keranjang kosong'); return; }
+      closeCartModal(); openCheckoutModal(); currentCheckoutStep = 1; showCheckoutStep(1);
       
       let count = 0, total = 0;
-      cart.forEach(i => { count += i.qty; total += i.harga * i.qty; });
-      document.getElementById('checkoutDesc').textContent = count + ' item - ' + formatRupiah(total);
-      document.getElementById('orderSummary').innerHTML = cart.map(i => `<div class="flex justify-between"><span>${i.nama} x${i.qty}</span><span>${formatRupiah(i.harga * i.qty)}</span></div>`).join('') + `<div class="border-t pt-2 mt-2 flex justify-between font-semibold"><span>Total</span><span class="text-emerald-600">${formatRupiah(total)}</span></div>`;
+      cart.forEach(i => { count += i.quantity; total += i.harga * i.quantity; });
+      document.getElementById('checkoutDescription').textContent = count + ' item - ' + formatRupiah(total);
+      document.getElementById('orderSummary').innerHTML = cart.map(i => `<div class="flex justify-between"><span>${i.nama} x${i.quantity}</span><span>${formatRupiah(i.harga * i.quantity)}</span></div>`).join('') + `<div class="border-t pt-2 mt-2 flex justify-between font-semibold"><span>Total</span><span class="text-emerald-600">${formatRupiah(total)}</span></div>`;
     }
-    
-    function showStep(s) {
-      document.getElementById('step1').classList.toggle('hidden', s !== 1);
-      document.getElementById('step2').classList.toggle('hidden', s !== 2);
-      document.getElementById('step3').classList.toggle('hidden', s !== 3);
+
+    function showCheckoutStep(s) {
+      currentCheckoutStep = s;
+      document.getElementById('checkoutStep1').classList.toggle('is-hidden', s !== 1);
+      document.getElementById('checkoutStep2').classList.toggle('is-hidden', s !== 2);
+      document.getElementById('checkoutStep3').classList.toggle('is-hidden', s !== 3);
       document.getElementById('checkoutTitle').textContent = ['Checkout', 'Pembayaran QRIS', 'Upload Bukti'][s - 1];
     }
-    
+
     function submitCheckout() {
-      const wa = document.getElementById('inputWa').value.trim();
-      if(!wa) return showToast('Masukkan nomor WhatsApp');
+      const wa = document.getElementById('inputWhatsapp').value.trim();
+      if (!wa) { showToast('Masukkan nomor WhatsApp'); return; }
       const clean = wa.replace(/\D/g, '');
-      if(clean.length < 10) return showToast('Nomor tidak valid');
+      if (clean.length < 10) { showToast('Nomor tidak valid'); return; }
       
       const formatted = clean.startsWith('0') ? '62' + clean.slice(1) : clean;
       let total = 0;
-      const items = cart.map(i => { total += i.harga * i.qty; return {id:i.id, nama:i.nama, harga:i.harga, qty:i.qty}; });
+      const items = cart.map(i => { total += i.harga * i.quantity; return { paketId: i.id, nama: i.nama, harga: i.harga, quantity: i.quantity }; });
       
-      currentOrder = {id:genId(), items, total, wa:formatted, status:'pending', time:Date.now(), exp:Date.now()+2*24*60*60*1000};
+      currentOrder = { id: generateOrderId(), items, total, noWhatsapp: formatted, status: 'pending', createdAt: Date.now(), expiresAt: Date.now() + 2*24*60*60*1000 };
       
-      // Save order
-      const key = 'wifi_orders_' + formatted;
-      const orders = loadLocal(key) || [];
+      const key = getStorageKey(formatted);
+      const orders = cleanExpiredOrders(formatted);
       orders.unshift(currentOrder);
-      saveLocal(key, orders);
+      safeLocalStorage('set', key, orders);
       
-      showStep(2);
-      document.getElementById('orderId').textContent = currentOrder.id;
-      document.getElementById('payTotal').textContent = formatRupiah(total);
+      currentCheckoutStep = 2;
+      showCheckoutStep(2);
+      document.getElementById('orderIdDisplay').textContent = currentOrder.id;
+      document.getElementById('paymentTotal').textContent = formatRupiah(total);
       
-      const p = CONFIG.paket.find(x => x.id === items[0]?.id);
-      document.getElementById('qrisImg').src = p?.qrisImage || CONFIG.qrisDinamis;
-      document.getElementById('qrisInfo').innerHTML = items.length === 1 
+      const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
+      document.getElementById('qrisImage').src = paket?.qrisImage || CONFIG.qrisDinamis;
+      document.getElementById('qrisInfo').innerHTML = currentOrder.items.length === 1 
         ? '<span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mb-2">QRIS Nominal Tetap</span>'
-        : `<div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs text-amber-800">QRIS Dinamis - Masukkan <strong>${formatRupiah(total)}</strong></div>`;
+        : `<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800"><strong>QRIS Dinamis:</strong> Masukkan nominal <strong>${formatRupiah(total)}</strong></div>`;
     }
-    
-    function confirmPay() {
-      if(!currentOrder) return;
-      const key = 'wifi_orders_' + currentOrder.wa;
-      const orders = loadLocal(key) || [];
-      orders.forEach(o => { if(o.id === currentOrder.id) o.status = 'paid'; });
-      saveLocal(key, orders);
+
+    function copyOrderId() {
+      if (!currentOrder) return;
+      navigator.clipboard.writeText(currentOrder.id);
+      showToast('ID disalin');
+    }
+
+    function confirmPayment() {
+      if (!currentOrder) return;
+      const key = getStorageKey(currentOrder.noWhatsapp);
+      const orders = cleanExpiredOrders(currentOrder.noWhatsapp);
+      orders.forEach(o => { if (o.id === currentOrder.id) o.status = 'paid'; });
+      safeLocalStorage('set', key, orders);
       currentOrder.status = 'paid';
-      showStep(3);
-      document.getElementById('finalSummary').innerHTML = `
-        <div class="flex justify-between"><span class="text-gray-500">ID</span><span class="font-mono font-semibold">${currentOrder.id}</span></div>
+      currentCheckoutStep = 3;
+      showCheckoutStep(3);
+      
+      document.getElementById('finalOrderSummary').innerHTML = `
+        <div class="flex justify-between"><span class="text-gray-500">ID Pesanan</span><span class="font-mono font-semibold">${currentOrder.id}</span></div>
         <div class="flex justify-between"><span class="text-gray-500">Item</span><span>${currentOrder.items.length} paket</span></div>
         <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-semibold text-emerald-600">${formatRupiah(currentOrder.total)}</span></div>
       `;
+      
       cart = []; saveCart(); updateCartUI();
     }
 
-    // History
     function loadHistory() {
-      const phone = document.getElementById('inputHistoryPhone').value.trim().replace(/\D/g, '');
-      if(phone.length < 10) return showToast('Nomor tidak valid');
+      const phone = document.getElementById('historyPhone').value.trim().replace(/\D/g, '');
+      if (phone.length < 10) { showToast('Nomor tidak valid'); return; }
       const formatted = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
-      const orders = loadLocal('wifi_orders_' + formatted) || [];
-      const container = document.getElementById('historyList');
+      const orders = cleanExpiredOrders(formatted);
       
-      if(!orders.length) { container.innerHTML = '<p class="text-center text-gray-500 py-4">Tidak ada pesanan</p>'; return; }
+      const container = document.getElementById('historyList');
+      if (orders.length === 0) { container.innerHTML = ''; showToast('Tidak ada pesanan'); return; }
       
       container.innerHTML = orders.map(o => `
         <div class="border rounded-lg p-3 space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="font-mono text-sm font-semibold">${o.id}</span>
-            <span class="${o.status==='pending'?'bg-gray-100 text-gray-700':o.status==='paid'?'bg-yellow-100 text-yellow-700':'bg-green-100 text-green-700'} text-xs px-2 py-1 rounded">${o.status==='pending'?'Menunggu':o.status==='paid'?'Dibayar':'Selesai'}</span>
-          </div>
-          <p class="text-xs text-gray-500">${formatDate(o.time)}</p>
+          <div class="flex justify-between"><span class="font-mono text-sm font-semibold">${o.id}</span>
+            <span class="${o.status === 'pending' ? 'bg-gray-100 text-gray-700' : o.status === 'paid' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'} text-xs px-2 py-1 rounded">${o.status === 'pending' ? 'Menunggu' : o.status === 'paid' ? 'Dibayar' : 'Selesai'}</span></div>
+          <p class="text-xs text-gray-500">${formatDate(o.createdAt)}</p>
           <div class="border-t pt-2 flex justify-between font-semibold"><span>Total</span><span class="text-emerald-600">${formatRupiah(o.total)}</span></div>
         </div>
       `).join('');
     }
 
-    // Chat
+    // Chat functions
+    function toggleChat() { document.getElementById('chatWindow').classList.contains('is-hidden') ? openChat() : closeChat(); }
     function openChat() {
-      document.getElementById('chatWindow').classList.remove('hidden');
-      document.getElementById('chatWidgetBtn').classList.add('hidden');
-      renderChat();
+      document.getElementById('chatWindow').classList.remove('is-hidden');
+      document.getElementById('chatWidgetBtn').classList.add('is-hidden');
+      document.body.classList.add('chat-open');
+      renderChatMessages();
     }
-    
     function closeChat() {
-      document.getElementById('chatWindow').classList.add('hidden');
-      document.getElementById('chatWidgetBtn').classList.remove('hidden');
+      document.getElementById('chatWindow').classList.add('is-hidden');
+      document.getElementById('chatWidgetBtn').classList.remove('is-hidden');
+      document.body.classList.remove('chat-open');
     }
     
-    function openChatWithOrder() {
+    function openChatWithOrderInfo() {
       openChat();
-      if(currentOrder) {
-        const items = currentOrder.items.map(i => i.nama + ' x' + i.qty).join(', ');
-        document.getElementById('inputMessage').value = `ID: ${currentOrder.id}\nPaket: ${items}\nTotal: ${formatRupiah(currentOrder.total)}\n\nIni bukti transaksinya.`;
-        const saved = loadLocal('wifi_chat_user');
-        if(saved?.phone) document.getElementById('inputPhone').value = saved.phone;
+      if (currentOrder) {
+        let itemsText = currentOrder.items.map(i => i.nama + ' x' + i.quantity).join(', ');
+        document.getElementById('chatInput').value = `Saya sudah order dengan ID: ${currentOrder.id}\nPaket: ${itemsText}\nTotal: ${formatRupiah(currentOrder.total)}\n\nIni bukti transaksinya.`;
+        
+        // Pre-fill phone
+        const savedUser = safeLocalStorage('get', 'wifi_chat_user');
+        if (savedUser?.phone) document.getElementById('chatUserPhone').value = savedUser.phone;
       }
     }
-    
-    function renderChat() {
+
+    function loadChatHistory() {
+      const saved = safeLocalStorage('get', 'wifi_chat_history');
+      if (saved) chatMessages = saved;
+      const savedUser = safeLocalStorage('get', 'wifi_chat_user');
+      if (savedUser) { chatUserInfo = savedUser; document.getElementById('chatUserPhone').value = savedUser.phone || ''; }
+    }
+
+    function saveChatHistory() { safeLocalStorage('set', 'wifi_chat_history', chatMessages); }
+
+    function renderChatMessages() {
       const container = document.getElementById('chatMessages');
-      let html = `<div class="chat-message received"><div class="chat-bubble">👋 Halo! Selamat datang di <strong>${CONFIG.namaToko}</strong><br><br>📱 <strong>Kode voucher dikirim via WhatsApp</strong><br>Pastikan nomor aktif!</div><span class="chat-time">Bot</span></div>`;
+      let html = `<div class="chat-message received"><div class="chat-bubble">👋 Halo! Selamat datang di <strong>${CONFIG.namaToko}</strong><br><br>📱 <strong>Kode voucher akan dikirim via WhatsApp</strong><br>Pastikan nomor WhatsApp aktif!</div><span class="chat-time">Bot</span></div>`;
       
-      chatHistory.forEach(m => {
-        html += m.type === 'sent'
-          ? `<div class="chat-message sent"><div class="chat-bubble">${escapeHtml(m.text)}</div><span class="chat-time">${formatTime(m.time)}</span></div>${m.img ? '<div class="chat-message sent"><div class="chat-bubble">📷 Bukti transaksi terlampir</div></div>' : ''}`
-          : `<div class="chat-message received"><div class="chat-bubble">${escapeHtml(m.text)}</div><span class="chat-time">${formatTime(m.time)}</span></div>`;
+      chatMessages.forEach(msg => {
+        html += msg.type === 'sent' 
+          ? `<div class="chat-message sent"><div class="chat-bubble">${escapeHtml(msg.text)}</div><span class="chat-time">${formatTime(msg.time)}</span></div>${msg.hasImage ? '<div class="chat-message sent"><div class="chat-bubble">📷 Bukti transaksi terlampir</div></div>' : ''}`
+          : `<div class="chat-message received"><div class="chat-bubble">${escapeHtml(msg.text)}</div><span class="chat-time">${formatTime(msg.time)}</span></div>`;
       });
       
       container.innerHTML = html;
       container.scrollTop = container.scrollHeight;
     }
-    
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     async function sendChat() {
-      const msg = document.getElementById('inputMessage').value.trim();
-      const phone = document.getElementById('inputPhone').value.trim();
+      const message = document.getElementById('chatInput').value.trim();
+      const phone = document.getElementById('chatUserPhone').value.trim();
       
-      if(!msg && !selectedImageBase64) return showToast('Masukkan pesan/gambar');
-      if(!phone) return showToast('Masukkan nomor WhatsApp');
-      if(phone.replace(/\D/g,'').length < 10) return showToast('Nomor tidak valid');
+      if (!message && !selectedImageBase64) { showToast('Masukkan pesan atau gambar'); return; }
+      if (!phone) { showToast('Masukkan nomor WhatsApp'); return; }
+      if (phone.replace(/\D/g, '').length < 10) { showToast('Nomor tidak valid'); return; }
       
-      saveLocal('wifi_chat_user', {phone});
+      chatUserInfo = { phone };
+      safeLocalStorage('set', 'wifi_chat_user', chatUserInfo);
       
-      const time = Date.now();
-      chatHistory.push({type:'sent', text:msg||'Bukti transaksi', time, img:!!selectedImageBase64});
-      saveLocal('wifi_chat', chatHistory);
-      renderChat();
-      document.getElementById('inputMessage').value = '';
+      const msgTime = Date.now();
+      chatMessages.push({ type: 'sent', text: message || 'Bukti transaksi', time: msgTime, hasImage: !!selectedImageBase64 });
+      saveChatHistory();
+      renderChatMessages();
+      document.getElementById('chatInput').value = '';
       
-      const tgMsg = `💬 <b>PESAN BARU</b>\n\n📱 <b>No. WA:</b> ${phone}\n🕐 <b>Waktu:</b> ${formatDate(time)}\n\n💬 <b>Pesan:</b>\n${msg||'Bukti transaksi'}\n\n---\n📍 ${CONFIG.namaToko}`;
+      const telegramMessage = `💬 <b>PESAN BARU dari Website</b>\n\n📱 <b>No. WhatsApp:</b> ${phone}\n🕐 <b>Waktu:</b> ${formatDate(msgTime)}\n\n💬 <b>Pesan:</b>\n${message || 'Bukti transaksi'}\n\n---\n📍 ${CONFIG.namaToko}`;
       
-      const res = await sendTelegram(tgMsg, selectedImageBase64);
+      const result = await sendTelegramMessage(telegramMessage, selectedImageBase64);
       
-      chatHistory.push({
-        type:'received',
-        text: res.ok ? `✅ Terkirim! Voucher akan dikirim ke WA (${phone})` : '⚠️ Disimpan. Hubungi admin via WA.',
+      chatMessages.push({
+        type: 'received',
+        text: result.ok ? `✅ Pesan terkirim! Kode voucher akan dikirim ke WhatsApp (${phone}). Silakan tutup chat ini.` : '⚠️ Pesan disimpan. Hubungi admin via WhatsApp untuk respon cepat.',
         time: Date.now()
       });
       
-      saveLocal('wifi_chat', chatHistory);
-      renderChat();
-      
-      if(selectedImageBase64) {
-        selectedImageBase64 = null;
-        document.getElementById('imagePreviewBox').classList.add('hidden');
-        document.getElementById('inputImage').value = '';
-      }
-      
+      saveChatHistory();
+      renderChatMessages();
+      if (selectedImageBase64) removeImage();
       showToast('Pesan terkirim!');
     }
 
-    // Camera
-    async function openCamera() {
-      try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
-        document.getElementById('cameraVideo').srcObject = cameraStream;
-        document.getElementById('cameraModal').classList.remove('hidden');
-      } catch(e) {
-        showToast('Tidak dapat mengakses kamera');
-      }
-    }
-    
-    function closeCamera() {
-      if(cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-      document.getElementById('cameraModal').classList.add('hidden');
-    }
-    
-    function capturePhoto() {
-      const video = document.getElementById('cameraVideo');
-      const canvas = document.getElementById('cameraCanvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      selectedImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
-      document.getElementById('previewImg').src = selectedImageBase64;
-      document.getElementById('previewName').textContent = 'Foto dari kamera';
-      document.getElementById('imagePreviewBox').classList.remove('hidden');
-      closeCamera();
-      showToast('Foto diambil');
-    }
-
-    // Start
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
