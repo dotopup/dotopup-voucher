@@ -1,1463 +1,1196 @@
-'use client'
-
-import { useState, useEffect, useCallback, useRef } from 'react'
-
-// ==================== CONFIGURATION ====================
-const CONFIG = {
-  namaToko: 'WIFI CIWATIN',
-  noWhatsappAdmin: '6281224940172',
-  alamat: 'Jl. Ciwatin Raya, Indonesia',
-  qrisDinamis: 'https://lh3.googleusercontent.com/d/1YfkLZDmNt_VudODS_kPCBjZkDERDwWfQ=w1000',
-  qrisImages: {
-    1000: 'https://lh3.googleusercontent.com/d/1LW9iabbZ2vw8F6nuVYm8l8-UlBCPQmf6=w1000',
-    2000: 'https://lh3.googleusercontent.com/d/1ctOlUttmK4Z4T6vj1zEC894LD8Cs-Tl-=w1000',
-    3000: 'https://lh3.googleusercontent.com/d/167po9cTDTEEL-lWILaExJ-qOIAerGsvY=w1000',
-    4000: 'https://lh3.googleusercontent.com/d/1WBmHYV44wa_2-SdCSaeQRge9rleXKS0S=w1000',
-    5000: 'https://lh3.googleusercontent.com/d/12FBSHS93yutAaV4RE2HXzCe48ww-ONCg=w1000',
-    7000: 'https://lh3.googleusercontent.com/d/1d_GZagyPNLkqGPbktn7eBhaMiopYlTIs=w1000',
-    13000: 'https://lh3.googleusercontent.com/d/1bwfSmTpiu8aYnOT1oW6BAxjOGJWYxel2=w1000',
-    100000: 'https://lh3.googleusercontent.com/d/1HZtBM8zP8xoSQHyl1X1WOFP89lUT4Dmj=w1000',
-  } as Record<number, string>,
-  paket: [
-    { id: '1', nama: 'Paket 2 Jam', durasi: '2 Jam', harga: 1000, kecepatan: '1 Device', kategori: 'cepat' },
-    { id: '2', nama: 'Paket 5 Jam', durasi: '5 Jam', harga: 2000, kecepatan: '1 Device', kategori: 'cepat' },
-    { id: '3', nama: 'Paket 12 Jam', durasi: '12 Jam', harga: 3000, kecepatan: '1 Device', kategori: 'cepat' },
-    { id: '4', nama: 'Paket 1 Hari', durasi: '24 Jam', harga: 4000, kecepatan: '1 Device', kategori: 'harian', bestSeller: true },
-    { id: '5', nama: 'Paket 2 Hari', durasi: '2 Hari', harga: 5000, kecepatan: '1 Device', kategori: 'harian' },
-    { id: '6', nama: 'Paket 3 Hari', durasi: '3 Hari', harga: 7000, kecepatan: '1 Device', kategori: 'harian' },
-    { id: '7', nama: 'Paket 6 Hari', durasi: '6 Hari', harga: 13000, kecepatan: '1 Device', kategori: 'mingguan' },
-    { id: '8', nama: 'Paket 1 Bulan', durasi: '1 Bulan', harga: 100000, kecepatan: 'Multi Device', kategori: 'rumah' },
-  ],
-}
-
-// ==================== TYPES ====================
-interface CartItem {
-  paket: (typeof CONFIG.paket)[number]
-  qty: number
-}
-
-interface Order {
-  id: string
-  phone: string
-  items: CartItem[]
-  total: number
-  timestamp: number
-  confirmed: boolean
-}
-
-// ==================== HELPERS ====================
-function formatRupiah(n: number): string {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
-}
-
-function generateOrderId(): string {
-  return 'WFI-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase()
-}
-
-function formatDateTime(ts: number): string {
-  const d = new Date(ts)
-  const pad = (n: number) => n.toString().padStart(2, '0')
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
-// ==================== TOAST HOOK ====================
-function useToast() {
-  const [toastVisible, setToastVisible] = useState(false)
-  const [toastMessage, setToastMessage] = useState('')
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-
-  const toast = useCallback((message: string) => {
-    setToastMessage(message)
-    setToastVisible(true)
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => {
-      setToastVisible(false)
-    }, 3000)
-  }, [])
-
-  return { toast, toastVisible, toastMessage }
-}
-
-// ==================== MAIN COMPONENT ====================
-export default function Home() {
-  const { toast, toastVisible, toastMessage } = useToast()
-
-  // ---- State ----
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [showCart, setShowCart] = useState(false)
-  const [showCheckout, setShowCheckout] = useState(false)
-  const [checkoutStep, setCheckoutStep] = useState(1)
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [showHistory, setShowHistory] = useState(false)
-  const [showCaraOrder, setShowCaraOrder] = useState(false)
-  const [showKritik, setShowKritik] = useState(false)
-  const [showInfoOffline, setShowInfoOffline] = useState(false)
-  const [showJoinJualan, setShowJoinJualan] = useState(false)
-  const [showInstallApp, setShowInstallApp] = useState(false)
-
-  // Checkout form
-  const [checkoutPhone, setCheckoutPhone] = useState('')
-  const [currentOrderId, setCurrentOrderId] = useState('')
-  const [payingLoading, setPayingLoading] = useState(false)
-
-  // Confirm form
-  const [confirmPhone, setConfirmPhone] = useState('')
-  const [confirmOrderId, setConfirmOrderId] = useState('')
-  const [confirmPreview, setConfirmPreview] = useState<Order | null>(null)
-  const [confirmImage, setConfirmImage] = useState<string | null>(null)
-  const [confirmMessage, setConfirmMessage] = useState('')
-  const [confirmSending, setConfirmSending] = useState(false)
-
-  // History
-  const [historyPhone, setHistoryPhone] = useState('')
-  const [historyOrders, setHistoryOrders] = useState<Order[]>([])
-  const [historySearched, setHistorySearched] = useState(false)
-
-  // Install banner
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
-  const [showInstallBanner, setShowInstallBanner] = useState(false)
-
-  // Copy
-  const [copiedId, setCopiedId] = useState('')
-
-  // Refs
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const cameraInputRef = useRef<HTMLInputElement>(null)
-
-  // ---- Load from localStorage ----
-  useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('wifi_cart')
-      if (savedCart) setCart(JSON.parse(savedCart))
-
-      const savedUser = localStorage.getItem('wifi_chat_user')
-      if (savedUser) {
-        const parsed = JSON.parse(savedUser)
-        if (parsed.phone) {
-          setCheckoutPhone(parsed.phone)
-          setConfirmPhone(parsed.phone)
-          setHistoryPhone(parsed.phone)
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load localStorage', e)
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WIFI CIWATIN - DOTOPUP</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#10b981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="DOTOPUP">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="WiFi Voucher Store - Internet Cepat & Terjangkau">
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0' stop-color='%2310b981'/%3E%3Cstop offset='1' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Cpath d='M30 40h40M40 20v40' stroke='white' stroke-width='8' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='50' r='15' fill='white'/%3E%3C/svg%3E">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIldJRkkgQ0lXQVRJTiAtIERPVE9QVVAiLAogICJzaG9ydF9uYW1lIjogIkRPVE9QVVAiLAogICJkZXNjcmlwdGlvbiI6ICJXaUZpIFZvdWNoZXIgU3RvcmUgLSBJbnRlcm5ldCBDZXBhdCAmIFRlcmphbmdrYXUiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2VjZmRmNSIsCiAgInRoZW1lX29sb3IiOiAiIzEwYjk4MSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmcreG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMTAwIDEwMCclM0UlM0NkZWZzJTNFJTNDbGluZWFyR3JhZGllbnQgaWQ9J2cnIHgxPScwJTI1JyB5MT0nMCUyNScgeDI9JzEwMCUyNScgeTI9JzEwMCUyNSclM0UlM0NzdG9wIG9mZnNldD0nMCcgc3RvcC1jb2xvcj0nJTIzMTBiOTgxJy8lM0UlM0NzdG9wIG9mZnNldD0nMScgc3RvcC1jb2xvcj0nJTIzMDZiNmQ0Jy8lM0UlM0MvbGluZWFyR3JhZGllbnQlM0UlM0MvZGVmcyUzRSUzQ3JlY3Qgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIHJ4PScyMCcgZmlsbD0ndXJsKCUyM2cpJy8lM0UlM0NwYXRoIGQ9J00zMCA0MGg0ME00MCAyMHY0MCcgc3Ryb2tlPSd3aGl0ZScgc3Ryb2tlLXdpZHRoPSc4JyBzdHJva2UtbGluZWNhcD0ncm91bmQnLyUzRSUzQ2NpcmNsZSBjeD0nNTAnIGN5PSc1MCcgcj0nMTUnIGZpbGw9J3doaXRlJy8lM0UlM0MlMkZzdmclM0UiLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .gradient-bg { background: linear-gradient(to bottom, #ecfdf5, white, #ecfeff); }
+    .gradient-btn { background: linear-gradient(to right, #10b981, #06b6d4); }
+    .gradient-btn:hover { background: linear-gradient(to right, #059669, #0891b2); }
+    .card-hover:hover { border-color: #10b981; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    
+    .modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+    
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-  }, [])
-
-  // ---- Save cart to localStorage ----
-  useEffect(() => {
-    try {
-      localStorage.setItem('wifi_cart', JSON.stringify(cart))
-    } catch (e) {
-      console.error('Failed to save cart', e)
+    
+    .is-hidden { display: none !important; }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
     }
-  }, [cart])
-
-  // ---- Save phone to localStorage ----
-  const savePhone = useCallback((phone: string) => {
-    if (phone) {
-      try {
-        localStorage.setItem('wifi_chat_user', JSON.stringify({ phone }))
-      } catch (e) {
-        console.error('Failed to save phone', e)
-      }
+    .pulse-glow { animation: pulse-glow 2s infinite; }
+    
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      min-width: 220px;
+      overflow: hidden;
+      z-index: 100;
+      animation: slideUp 0.2s ease-out;
     }
-  }, [])
-
-  // ---- PWA install prompt ----
-  useEffect(() => {
-    const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e)
-      setShowInstallBanner(true)
+    
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
-  }, [])
-
-  // ---- Cart functions ----
-  const addToCart = useCallback((paket: (typeof CONFIG.paket)[number]) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.paket.id === paket.id)
-      if (existing) {
-        return prev.map((item) =>
-          item.paket.id === paket.id ? { ...item, qty: item.qty + 1 } : item
-        )
-      }
-      return [...prev, { paket, qty: 1 }]
-    })
-    toast(`${paket.nama} ditambahkan ✓`)
-  }, [toast])
-
-  const updateCartQty = useCallback((paketId: string, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.paket.id === paketId ? { ...item, qty: item.qty + delta } : item
-        )
-        .filter((item) => item.qty > 0)
-    )
-  }, [])
-
-  const removeFromCart = useCallback((paketId: string) => {
-    setCart((prev) => prev.filter((item) => item.paket.id !== paketId))
-  }, [])
-
-  const clearCart = useCallback(() => {
-    setCart([])
-  }, [])
-
-  const cartTotal = cart.reduce((sum, item) => sum + item.paket.harga * item.qty, 0)
-  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0)
-
-  // ---- Order functions ----
-  const getOrdersForPhone = useCallback((phone: string): Order[] => {
-    try {
-      const digits = phone.replace(/\D/g, '')
-      const key = `wifi_orders_${digits}`
-      const data = localStorage.getItem(key)
-      if (!data) return []
-      let orders: Order[] = JSON.parse(data)
-      const twoDaysAgo = Date.now() - 2 * 24 * 60 * 60 * 1000
-      orders = orders.filter((o) => o.timestamp > twoDaysAgo)
-      localStorage.setItem(key, JSON.stringify(orders))
-      return orders
-    } catch {
-      return []
+    .dropdown-item:hover { background: #f5f5f5; }
+    .dropdown-item svg { width: 20px; height: 20px; color: #6b7280; flex-shrink: 0; }
+    
+    .upload-method-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
     }
-  }, [])
-
-  const saveOrderForPhone = useCallback((phone: string, order: Order) => {
-    try {
-      const digits = phone.replace(/\D/g, '')
-      const key = `wifi_orders_${digits}`
-      const existing = getOrdersForPhone(phone)
-      existing.unshift(order)
-      localStorage.setItem(key, JSON.stringify(existing))
-    } catch (e) {
-      console.error('Failed to save order', e)
+    .upload-method-btn:hover { border-color: #10b981; background: #f0fdf4; }
+    .upload-method-btn svg { width: 24px; height: 24px; color: #10b981; }
+    
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
     }
-  }, [getOrdersForPhone])
-
-  // ---- Lookup order preview ----
-  const lookupOrder = useCallback((phone: string, orderId: string) => {
-    if (!phone || !orderId) {
-      setConfirmPreview(null)
-      return
+    .btn-back:hover { background: #e5e7eb; }
+    
+    .best-value-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-radius: 0 12px 0 12px;
     }
-    const orders = getOrdersForPhone(phone)
-    const found = orders.find((o) => o.id === orderId)
-    setConfirmPreview(found || null)
-  }, [getOrdersForPhone])
-
-  useEffect(() => {
-    if (confirmPhone && confirmOrderId) {
-      lookupOrder(confirmPhone, confirmOrderId)
-    } else {
-      setConfirmPreview(null)
+    
+    .image-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 8px; }
+    
+    /* Install App Banner */
+    .install-banner {
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
-  }, [confirmPhone, confirmOrderId, lookupOrder])
-
-  // ---- Checkout ----
-  const startCheckout = useCallback(() => {
-    if (cart.length === 0) {
-      toast('Keranjang kosong! Tambahkan paket terlebih dahulu')
-      return
+    .install-banner:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
     }
-    setShowCart(false)
-    setCheckoutStep(1)
-    setShowCheckout(true)
-  }, [cart.length, toast])
-
-  const proceedToPayment = useCallback(() => {
-    if (!checkoutPhone) {
-      toast('Nomor WhatsApp wajib diisi!')
-      return
+    .install-banner-icon {
+      width: 48px;
+      height: 48px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
-    savePhone(checkoutPhone)
-    const orderId = generateOrderId()
-    setCurrentOrderId(orderId)
-    setCheckoutStep(2)
-  }, [checkoutPhone, savePhone, toast])
-
-  const handleSudahBayar = useCallback(() => {
-    setPayingLoading(true)
-    setTimeout(() => {
-      setPayingLoading(false)
-      setCheckoutStep(3)
-    }, 5000)
-  }, [])
-
-  // ---- Save order when proceeding to payment ----
-  useEffect(() => {
-    if (checkoutStep === 2 && currentOrderId && checkoutPhone) {
-      const order: Order = {
-        id: currentOrderId,
-        phone: checkoutPhone,
-        items: [...cart],
-        total: cartTotal,
-        timestamp: Date.now(),
-        confirmed: false,
-      }
-      saveOrderForPhone(checkoutPhone, order)
+    .install-banner-icon svg { width: 28px; height: 28px; color: #10b981; }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      width: 24px; height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
-  }, [checkoutStep, currentOrderId, checkoutPhone, cart, cartTotal, saveOrderForPhone])
-
-  // ---- Confirm / Submit to Telegram ----
-  const submitConfirmation = useCallback(async () => {
-    if (!confirmPhone) {
-      toast('Nomor WhatsApp wajib diisi!')
-      return
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .btn-loading { position: relative; pointer-events: none; opacity: 0.9; }
+    .btn-loading .btn-text { visibility: hidden; }
+    .btn-loading .btn-spinner { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+    
+    /* Progress bar */
+    .progress-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+    .progress-bar { height: 100%; background: white; border-radius: 2px; animation: progress 5s linear forwards; }
+    @keyframes progress { from { width: 0%; } to { width: 100%; } }
+    
+    /* Confirm Order */
+    .confirm-order-section { margin-top: 24px; margin-bottom: 24px; }
+    .confirm-order-card {
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      border-radius: 16px; padding: 20px 24px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      cursor: pointer; transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+      max-width: 320px; margin: 0 auto;
     }
+    .confirm-order-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
+    .confirm-order-card .icon-wrapper { width: 48px; height: 48px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .confirm-order-card .icon-wrapper svg { width: 26px; height: 26px; color: #10b981; }
+    .confirm-order-card .text-content { color: white; }
+    .confirm-order-card .text-content .title { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+    .confirm-order-card .text-content .subtitle { font-size: 12px; opacity: 0.9; }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen flex flex-col">
 
-    const now = Date.now()
-    let itemsText = ''
-    if (confirmPreview && confirmPreview.items.length > 0) {
-      confirmPreview.items.forEach((item, i) => {
-        itemsText += `│ ${i + 1}. ${item.paket.nama}\n`
-        itemsText += `│    Durasi: ${item.paket.durasi}\n`
-        itemsText += `│    ${item.paket.kecepatan}\n`
-        itemsText += `│    ${item.qty}x ${formatRupiah(item.paket.harga)} = ${formatRupiah(item.paket.harga * item.qty)}\n`
-      })
-      itemsText += `├──────────────────────────────┤\n`
-      itemsText += `│ TOTAL: ${formatRupiah(confirmPreview.total)}\n`
-    } else {
-      itemsText = '│ (Pesanan tidak ditemukan)\n'
-    }
+  <!-- ==================== KONFIGURASI ==================== -->
+  <script>
+    const CONFIG = {
+      namaToko: "WIFI CIWATIN",
+      noWhatsappAdmin: "6281224940172",
+      alamat: "Jl. Ciwatin Raya, Indonesia",
+      qrisDinamis: "https://lh3.googleusercontent.com/d/1YfkLZDmNt_VudODS_kPCBjZkDERDwWfQ=w1000",
+      
+      // =============================================
+      // GANTI URL INI DENGAN URL CLOUDFLARE WORKER ANDA
+      // Contoh: https://wifi-ciwatin.bot-api.workers.dev
+      // =============================================
+      workerUrl: "GANTI_DENGAN_URL_WORKER_ANDA",
+      
+      qrisImages: {
+        1000: "https://lh3.googleusercontent.com/d/1LW9iabbZ2vw8F6nuVYm8l8-UlBCPQmf6=w1000",
+        2000: "https://lh3.googleusercontent.com/d/1ctOlUttmK4Z4T6vj1zEC894LD8Cs-Tl-=w1000",
+        3000: "https://lh3.googleusercontent.com/d/167po9cTDTEEL-lWILaExJ-qOIAerGsvY=w1000",
+        4000: "https://lh3.googleusercontent.com/d/1WBmHYV44wa_2-SdCSaeQRge9rleXKS0S=w1000",
+        5000: "https://lh3.googleusercontent.com/d/12FBSHS93yutAaV4RE2HXzCe48ww-ONCg=w1000",
+        7000: "https://lh3.googleusercontent.com/d/1d_GZagyPNLkqGPbktn7eBhaMiopYlTIs=w1000",
+        13000: "https://lh3.googleusercontent.com/d/1bwfSmTpiu8aYnOT1oW6BAxjOGJWYxel2=w1000",
+        100000: "https://lh3.googleusercontent.com/d/1HZtBM8zP8xoSQHyl1X1WOFP89lUT4Dmj=w1000"
+      },
+      
+      paket: [
+        { id: "1", nama: "Paket 2 Jam", durasi: "2 Jam", harga: 1000, kecepatan: "1 Device", kategori: "cepat" },
+        { id: "2", nama: "Paket 5 Jam", durasi: "5 Jam", harga: 2000, kecepatan: "1 Device", kategori: "cepat" },
+        { id: "3", nama: "Paket 12 Jam", durasi: "12 Jam", harga: 3000, kecepatan: "1 Device", kategori: "cepat" },
+        { id: "4", nama: "Paket 1 Hari", durasi: "24 Jam", harga: 4000, kecepatan: "1 Device", kategori: "harian", bestSeller: true },
+        { id: "5", nama: "Paket 2 Hari", durasi: "2 Hari", harga: 5000, kecepatan: "1 Device", kategori: "harian" },
+        { id: "6", nama: "Paket 3 Hari", durasi: "3 Hari", harga: 7000, kecepatan: "1 Device", kategori: "harian" },
+        { id: "7", nama: "Paket 6 Hari", durasi: "6 Hari", harga: 13000, kecepatan: "1 Device", kategori: "mingguan" },
+        { id: "8", nama: "Paket 1 Bulan", durasi: "1 Bulan", harga: 100000, kecepatan: "Multi Device", kategori: "rumah" }
+      ]
+    };
+  </script>
 
-    const telegramMessage =
-`═══════════════════════════════
-        🛒 WIFI CIWATIN
-═══════════════════════════════
-
-📥 KONFIRMASI PESANAN
-────────────────────────────────
-🆔 ID Pesanan: ${confirmOrderId || '-'}
-📱 No. WhatsApp: ${confirmPhone}
-🕐 Waktu: ${formatDateTime(now)}
-
-┌──────────────────────────────┐
-│       📦 DETAIL PESANAN       │
-├──────────────────────────────┤
-${itemsText}└──────────────────────────────┘
-
-💬 Pesan: ${confirmMessage || '-'}
-
-────────────────────────────────
-📍 WIFI CIWATIN
-📍 ${CONFIG.alamat}
-═══════════════════════════════
-       Terima kasih! 🙏
-═══════════════════════════════`
-
-    setConfirmSending(true)
-    try {
-      const res = await fetch('/api/telegram', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: telegramMessage,
-          imageBase64: confirmImage || undefined,
-        }),
-      })
-      const result = await res.json()
-
-      if (result.ok) {
-        if (confirmPhone && confirmOrderId) {
-          const digits = confirmPhone.replace(/\D/g, '')
-          const key = `wifi_orders_${digits}`
-          try {
-            const data = localStorage.getItem(key)
-            if (data) {
-              const orders: Order[] = JSON.parse(data)
-              const idx = orders.findIndex((o) => o.id === confirmOrderId)
-              if (idx >= 0) {
-                orders[idx].confirmed = true
-                localStorage.setItem(key, JSON.stringify(orders))
-              }
-            }
-          } catch (e) {
-            console.error('Failed to update order', e)
-          }
-        }
-
-        toast('✅ Konfirmasi berhasil dikirim!')
-        setShowConfirm(false)
-        setConfirmImage(null)
-        setConfirmMessage('')
-        setConfirmOrderId('')
-        setConfirmPreview(null)
-        setCheckoutStep(1)
-        setShowCheckout(false)
-        setCart([])
-        setCurrentOrderId('')
-      } else {
-        toast('❌ Gagal mengirim, coba lagi')
-      }
-    } catch (error) {
-      console.error('Submit confirmation error:', error)
-      toast('❌ Periksa koneksi internet Anda')
-    } finally {
-      setConfirmSending(false)
-    }
-  }, [confirmPhone, confirmOrderId, confirmMessage, confirmImage, confirmPreview, toast])
-
-  // ---- Image upload ----
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (file.size > 5 * 1024 * 1024) {
-      toast('File terlalu besar! Maksimal 5MB')
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = () => {
-      setConfirmImage(reader.result as string)
-    }
-    reader.readAsDataURL(file)
-    e.target.value = ''
-  }, [toast])
-
-  // ---- History search ----
-  const searchHistory = useCallback(() => {
-    if (!historyPhone) {
-      toast('Masukkan nomor WhatsApp!')
-      return
-    }
-    savePhone(historyPhone)
-    const orders = getOrdersForPhone(historyPhone)
-    setHistoryOrders(orders)
-    setHistorySearched(true)
-  }, [historyPhone, getOrdersForPhone, savePhone, toast])
-
-  // ---- Copy order ID ----
-  const copyOrderId = useCallback((id: string) => {
-    navigator.clipboard.writeText(id).then(() => {
-      setCopiedId(id)
-      toast('ID Pesanan disalin!')
-      setTimeout(() => setCopiedId(''), 2000)
-    })
-  }, [toast])
-
-  // ---- QRIS image for checkout ----
-  const getQrisImage = useCallback(() => {
-    if (cart.length === 1 && CONFIG.qrisImages[cart[0].paket.harga]) {
-      return CONFIG.qrisImages[cart[0].paket.harga]
-    }
-    return CONFIG.qrisDinamis
-  }, [cart])
-
-  // ---- Close all modals ----
-  const closeAllModals = useCallback(() => {
-    setShowCart(false)
-    setShowCheckout(false)
-    setShowConfirm(false)
-    setShowHistory(false)
-    setShowCaraOrder(false)
-    setShowKritik(false)
-    setShowInfoOffline(false)
-    setShowJoinJualan(false)
-    setShowInstallApp(false)
-    setMenuOpen(false)
-  }, [])
-
-  // ---- Close all modals on ESC ----
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeAllModals()
-    }
-    window.addEventListener('keydown', handleEsc)
-    return () => window.removeEventListener('keydown', handleEsc)
-  }, [closeAllModals])
-
-  // ---- Prevent body scroll when modal open ----
-  const anyModalOpen = showCart || showCheckout || showConfirm || showHistory || showCaraOrder || showKritik || showInfoOffline || showJoinJualan || showInstallApp
-
-  useEffect(() => {
-    if (anyModalOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => { document.body.style.overflow = '' }
-  }, [anyModalOpen])
-
-  // ---- Close dropdown on outside click ----
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (menuOpen) {
-        const target = e.target as HTMLElement
-        if (!target.closest('.relative')) {
-          setMenuOpen(false)
-        }
-      }
-    }
-    document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
-  }, [menuOpen])
-
-  const kategoriCardBg: Record<string, string> = {
-    cepat: 'from-cyan-50 to-blue-50',
-    harian: 'from-emerald-50 to-teal-50',
-    mingguan: 'from-amber-50 to-orange-50',
-    rumah: 'from-purple-50 to-pink-50',
-  }
-
-  // ==================== RENDER ====================
-  return (
-    <div className="gradient-bg font-['Inter',sans-serif] min-h-screen flex flex-col">
-      {/* ==================== HEADER ==================== */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b shadow-sm">
-        <div className="container mx-auto px-3 sm:px-4 py-3 flex items-center justify-between">
-          {/* Left */}
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-btn flex items-center justify-center shadow-lg">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="font-bold text-base sm:text-lg text-gray-900">{CONFIG.namaToko}</h1>
-              <p className="text-xs text-gray-500 hidden sm:block">Internet Cepat &amp; Terjangkau</p>
-            </div>
-          </div>
-
-          {/* Right */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            {/* Menu Button */}
-            <div className="relative">
-              <button
-                onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen) }}
-                className="px-3 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-1"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                </svg>
-              </button>
-              {/* Dropdown */}
-              <div className={menuOpen ? 'dropdown-menu' : 'is-hidden'}>
-                <button onClick={() => { setShowCaraOrder(true); setMenuOpen(false) }} className="dropdown-item text-sm text-gray-700">
-                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                  </svg>
-                  Cara Order
-                </button>
-                <button onClick={() => { setShowKritik(true); setMenuOpen(false) }} className="dropdown-item text-sm text-gray-700">
-                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  Kritik &amp; Saran
-                </button>
-                <button onClick={() => { setShowInfoOffline(true); setMenuOpen(false) }} className="dropdown-item text-sm text-gray-700">
-                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  Info Offline
-                </button>
-                <button onClick={() => { setShowJoinJualan(true); setMenuOpen(false) }} className="dropdown-item text-sm text-gray-700">
-                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Join Jualan
-                </button>
-              </div>
-            </div>
-
-            {/* History Button */}
-            <button onClick={() => setShowHistory(true)} className="px-3 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-1">
-              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="hidden sm:inline text-sm">Pesanan</span>
-            </button>
-
-            {/* Cart Button */}
-            <button onClick={() => setShowCart(true)} className="relative gradient-btn text-white px-3 py-2 rounded-lg flex items-center gap-1 sm:gap-2 transition">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <span className="hidden sm:inline text-sm">Keranjang</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {cartCount > 99 ? '99+' : cartCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* ==================== HERO SECTION ==================== */}
-      <section className="py-6 sm:py-10 px-3 sm:px-4 text-center">
-        <div className="bg-emerald-100 text-emerald-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm inline-flex items-center gap-1.5 mb-4">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+  <!-- Header -->
+  <header id="mainHeader" class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b shadow-sm">
+    <div class="container mx-auto px-3 sm:px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-btn flex items-center justify-center shadow-lg">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
           </svg>
-          Koneksi Super Cepat
         </div>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">ORDER WIFI DOTOPUP</h2>
-        <p className="text-gray-600 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
-          Pilih paket, bayar via QRIS, Upload bukti pembayaran di live chat, tunggu kode di kirim via WhatsApp!
-        </p>
-      </section>
-
-      {/* ==================== MAIN CONTENT ==================== */}
-      <main className="flex-1 container mx-auto px-3 sm:px-4 pb-24">
-        {/* Install App Banner */}
-        {showInstallBanner && (
-          <div className="install-banner" onClick={() => setShowInstallApp(true)}>
-            <div className="install-banner-icon">
-              <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-white">Install Aplikasi</p>
-              <p className="text-xs text-white/80">Akses lebih cepat dari homescreen</p>
-            </div>
-            <svg className="w-5 h-5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        )}
-
-        {/* Category Badges */}
-        <div className="flex flex-wrap gap-2 justify-center mb-6">
-          <span className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium cursor-pointer hover:bg-blue-200 transition-colors">💎 Paket Cepat</span>
-          <span className="bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium cursor-pointer hover:bg-emerald-200 transition-colors">💎 Paket Harian</span>
-          <span className="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium cursor-pointer hover:bg-purple-200 transition-colors">💎 Paket Mingguan</span>
-          <span className="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium cursor-pointer hover:bg-orange-200 transition-colors">💎 Paket Internet Rumah</span>
-        </div>
-
-        {/* Package Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-          {CONFIG.paket.map((paket) => {
-            const inCart = cart.find((c) => c.paket.id === paket.id)
-            return (
-              <div
-                key={paket.id}
-                className={`border-2 border-transparent card-hover rounded-xl bg-white transition-all duration-300 group p-4 relative overflow-hidden bg-gradient-to-br ${kategoriCardBg[paket.kategori] || ''}`}
-              >
-                {paket.bestSeller && (
-                  <div className="best-value-badge">⭐</div>
-                )}
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-btn flex items-center justify-center mb-3">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="font-semibold text-sm sm:text-base text-gray-900 mb-1">{paket.nama}</h3>
-                <p className="text-xl sm:text-2xl font-bold text-emerald-600 mb-1">{formatRupiah(paket.harga)}</p>
-                <p className="text-xs sm:text-sm text-gray-500 mb-3">{paket.durasi} · {paket.kecepatan}</p>
-                <button
-                  onClick={() => addToCart(paket)}
-                  className="gradient-btn text-white py-2 rounded-lg text-sm w-full font-medium hover:opacity-90 transition-opacity"
-                >
-                  + Tambah
-                </button>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Confirm Order Section */}
-        <div className="confirm-order-section">
-          <div className="confirm-order-card" onClick={() => {
-            if (cart.length === 0) {
-              toast('Keranjang kosong! Tambahkan paket terlebih dahulu')
-              return
-            }
-            setShowConfirm(true)
-          }}>
-            <div className="icon-wrapper">
-              <svg className="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="text-content">
-              <div className="title">Konfirmasi Pesanan</div>
-              <div className="subtitle">Upload bukti pembayaran di sini</div>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* ==================== FLOATING CART (Mobile) ==================== */}
-      {cartCount > 0 && (
-        <button
-          onClick={() => setShowCart(true)}
-          className="fixed bottom-4 left-4 right-4 z-40 sm:hidden gradient-btn text-white py-3 px-4 rounded-xl shadow-lg flex items-center justify-between"
-        >
-          <span className="flex items-center gap-2 font-semibold text-sm">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {cartCount} item
-          </span>
-          <span className="font-bold text-sm">{formatRupiah(cartTotal)}</span>
-        </button>
-      )}
-
-      {/* ==================== FOOTER ==================== */}
-      <footer className="bg-gray-900 text-white py-6 mt-auto">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl gradient-btn flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-              </svg>
-            </div>
-            <span className="font-semibold">{CONFIG.namaToko}</span>
-          </div>
-          <p className="text-gray-400 text-sm mb-3">{CONFIG.alamat}</p>
-          <div className="flex items-center justify-center gap-4 text-sm">
-            <a
-              href={`https://wa.me/${CONFIG.noWhatsappAdmin}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              WhatsApp
-            </a>
-            <span className="text-gray-600">|</span>
-            <button onClick={() => setShowConfirm(true)} className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              Konfirmasi
-            </button>
-          </div>
-          <p className="text-gray-500 text-xs mt-4">
-            &copy; {new Date().getFullYear()} {CONFIG.namaToko}
-          </p>
-          <p className="text-center text-xs text-gray-600 mt-1">Design by Nursidik</p>
-        </div>
-      </footer>
-
-      {/* ==================== TOAST ==================== */}
-      <div
-        className={`fixed bottom-20 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 z-50 transition-all duration-300 ${
-          toastVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg text-sm">
-          {toastMessage}
+        <div>
+          <h1 class="font-bold text-base sm:text-lg text-gray-900" id="storeName">WIFI CIWATIN</h1>
+          <p class="text-xs text-gray-500 hidden sm:block">Internet Cepat & Terjangkau</p>
         </div>
       </div>
-
-      {/* ==================== CART MODAL ==================== */}
-      <div className={anyModalOpen ? '' : 'is-hidden'}>
-        <div className="modal-overlay absolute inset-0 z-50" onClick={closeAllModals} />
-        {/* Cart Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showCart ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => setShowCart(false)} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              Keranjang
-            </h2>
-            {cart.length === 0 ? (
-              <div className="text-center py-12">
-                <svg className="w-16 h-16 mx-auto text-gray-200 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <p className="text-gray-400 text-sm">Keranjang masih kosong</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {cart.map((item) => (
-                  <div key={item.paket.id} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-gray-800 truncate">{item.paket.nama}</h4>
-                      <p className="text-xs text-gray-400">{item.paket.durasi} · {item.paket.kecepatan}</p>
-                      <p className="text-sm font-bold text-emerald-600 mt-1">{formatRupiah(item.paket.harga * item.qty)}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => updateCartQty(item.paket.id, -1)}
-                        className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-100 text-gray-600 text-sm font-bold"
-                      >
-                        −
-                      </button>
-                      <span className="text-sm font-bold w-6 text-center">{item.qty}</span>
-                      <button
-                        onClick={() => updateCartQty(item.paket.id, 1)}
-                        className="w-8 h-8 rounded-full gradient-btn text-white flex items-center justify-center text-sm font-bold"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => removeFromCart(item.paket.id)}
-                        className="w-8 h-8 rounded-full bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 ml-1"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <div className="border-t border-gray-200 pt-3 mt-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-gray-500">Total</span>
-                    <span className="text-xl font-bold text-emerald-600">{formatRupiah(cartTotal)}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={clearCart} className="flex-1 py-3 border border-gray-200 text-gray-500 rounded-xl text-sm font-medium hover:bg-gray-50">
-                      Hapus Semua
-                    </button>
-                    <button onClick={startCheckout} className="flex-1 py-3 gradient-btn text-white rounded-xl text-sm font-bold">
-                      Checkout
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Checkout Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showCheckout ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => { setShowCheckout(false); setCheckoutStep(1); setCurrentOrderId('') }} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            {/* Step 1: Order Form */}
-            <div className={checkoutStep === 1 ? '' : 'is-hidden'}>
-              <h2 className="text-lg font-bold text-gray-900 mb-4">📋 Pesanan</h2>
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Nomor WhatsApp *</label>
-                <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <input
-                    type="tel"
-                    placeholder="08xxxxxxxxxx"
-                    value={checkoutPhone}
-                    onChange={(e) => setCheckoutPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Ringkasan Pesanan</h3>
-                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                  {cart.map((item) => (
-                    <div key={item.paket.id} className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">{item.paket.nama}</p>
-                        <p className="text-xs text-gray-400">{item.qty}x {formatRupiah(item.paket.harga)}</p>
-                      </div>
-                      <p className="text-sm font-bold text-gray-800">{formatRupiah(item.paket.harga * item.qty)}</p>
-                    </div>
-                  ))}
-                  <div className="border-t border-gray-200 pt-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-gray-700">Total</span>
-                      <span className="text-lg font-bold text-emerald-600">{formatRupiah(cartTotal)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button onClick={proceedToPayment} className="w-full py-3 gradient-btn text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2">
-                Lanjut ke Pembayaran
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <button id="btnMenu" class="flex items-center gap-1 sm:gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+          </button>
+          <div id="dropdownMenu" class="dropdown-menu is-hidden">
+            <div id="menuCaraOrder" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+              <span>Cara Order Paket</span>
             </div>
-
-            {/* Step 2: QRIS Payment */}
-            <div className={checkoutStep === 2 ? '' : 'is-hidden'}>
-              <h2 className="text-lg font-bold text-gray-900 mb-4">💳 Pembayaran</h2>
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-500">ID Pesanan</p>
-                    <p className="text-sm font-mono font-bold text-gray-800">{currentOrderId}</p>
-                  </div>
-                  <button onClick={() => copyOrderId(currentOrderId)} className="p-2 bg-white rounded-lg hover:bg-gray-50">
-                    {copiedId === currentOrderId ? (
-                      <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-              <div className="text-center mb-4">
-                <p className="text-sm font-semibold text-gray-700 mb-1">Scan QRIS untuk bayar</p>
-                <p className="text-xs text-gray-400 mb-3">Total: <span className="font-bold text-emerald-600">{formatRupiah(cartTotal)}</span></p>
-                <div className="bg-white border border-gray-200 rounded-xl p-4 inline-block">
-                  <img src={getQrisImage()} alt="QRIS" className="w-56 h-56 object-contain rounded-lg" onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    if (target.src !== CONFIG.qrisDinamis) target.src = CONFIG.qrisDinamis
-                  }} />
-                </div>
-                <p className="text-[10px] text-gray-400 mt-2">Pembayaran via QRIS (GoPay, OVO, Dana, dll)</p>
-              </div>
-              <button
-                onClick={handleSudahBayar}
-                disabled={payingLoading}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 ${payingLoading ? 'bg-gray-400' : 'gradient-btn'}`}
-              >
-                {payingLoading ? (
-                  <>
-                    <div className="loading-spinner" />
-                    <span className="btn-text">Memproses pembayaran...</span>
-                  </>
-                ) : (
-                  '✅ Saya Sudah Bayar'
-                )}
-              </button>
-              {payingLoading && (
-                <div className="progress-bar-container mt-3">
-                  <div className="progress-bar" />
-                </div>
-              )}
+            <div id="menuKritikSaran" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+              <span>Kritik & Saran</span>
             </div>
-
-            {/* Step 3: Upload Bukti */}
-            <div className={checkoutStep === 3 ? '' : 'is-hidden'}>
-              <h2 className="text-lg font-bold text-gray-900 mb-4">📤 Upload Bukti</h2>
-              <div className="text-center py-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-1">Pembayaran Diterima!</h3>
-                <p className="text-sm text-gray-500 mb-4">Silakan upload bukti pembayaran Anda</p>
-                <button
-                  onClick={() => {
-                    setShowCheckout(false)
-                    setShowConfirm(true)
-                    setConfirmPhone(checkoutPhone)
-                    setConfirmOrderId(currentOrderId)
-                  }}
-                  className="w-full py-3.5 gradient-btn text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Upload Bukti Pembayaran
-                </button>
-              </div>
+            <div id="menuInfoOffline" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span>Info Pembelian Offline</span>
+            </div>
+            <div id="menuJoinJualan" class="dropdown-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>Join Jualan Voucher</span>
             </div>
           </div>
         </div>
+        
+        <button id="btnHistory" class="flex items-center gap-1 sm:gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span class="hidden sm:inline text-sm">Pesanan</span>
+        </button>
+        <button id="btnCart" class="relative gradient-btn text-white px-3 py-2 rounded-lg flex items-center gap-1 sm:gap-2 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          <span class="hidden sm:inline text-sm">Keranjang</span>
+          <span id="cartBadge" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center is-hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
 
-        {/* Confirm Order Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showConfirm ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => { setShowConfirm(false); setConfirmImage(null) }} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4 space-y-4">
-            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Konfirmasi Pesanan
-            </h2>
+  <!-- Hero Section -->
+  <section class="py-6 sm:py-10 px-3 sm:px-4">
+    <div class="container mx-auto text-center">
+      <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm mb-3 sm:mb-4">
+        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        Koneksi Super Cepat
+      </div>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 px-2">ORDER WIFI DOTOPUP</h2>
+      <p class="text-gray-600 max-w-md mx-auto text-sm sm:text-base px-4">Pilih paket, bayar via QRIS, Upload bukti pembayaran di live chat, tunggu kode di kirim via WhatsApp!</p>
+    </div>
+  </section>
 
-            {/* WhatsApp */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Nomor WhatsApp *</label>
-              <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                </svg>
-                <input
-                  type="tel"
-                  placeholder="08xxxxxxxxxx"
-                  value={confirmPhone}
-                  onChange={(e) => setConfirmPhone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            {/* Order ID */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">ID Pesanan (opsional)</label>
-              <input
-                type="text"
-                placeholder="WFI-XXXXXXXXXX-XXXXXX"
-                value={confirmOrderId}
-                onChange={(e) => setConfirmOrderId(e.target.value.toUpperCase())}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-              />
-              {confirmPreview && (
-                <div className="mt-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                  <p className="text-xs font-semibold text-emerald-700 mb-1">✅ Pesanan ditemukan</p>
-                  <div className="space-y-1">
-                    {confirmPreview.items.map((item, i) => (
-                      <p key={i} className="text-xs text-gray-600">
-                        {item.qty}x {item.paket.nama} = {formatRupiah(item.paket.harga * item.qty)}
-                      </p>
-                    ))}
-                    <p className="text-xs font-bold text-emerald-700 border-t border-emerald-200 pt-1 mt-1">
-                      Total: {formatRupiah(confirmPreview.total)}
-                    </p>
-                  </div>
-                  {confirmPreview.confirmed && (
-                    <p className="text-xs text-emerald-600 font-semibold mt-1">✅ Sudah dikonfirmasi sebelumnya</p>
-                  )}
-                </div>
-              )}
-              {confirmPhone && confirmOrderId && !confirmPreview && (
-                <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                  <p className="text-xs text-amber-600">⚠️ Pesanan tidak ditemukan. Pastikan ID pesanan benar.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Image Upload */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Bukti Pembayaran</label>
-              {confirmImage ? (
-                <div className="relative">
-                  <img src={confirmImage} alt="Bukti" className="image-preview w-full" />
-                  <button
-                    onClick={() => setConfirmImage(null)}
-                    className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => fileInputRef.current?.click()} className="upload-method-btn">
-                    <svg className="w-8 h-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-xs text-gray-500">Galeri</span>
-                  </button>
-                  <button onClick={() => cameraInputRef.current?.click()} className="upload-method-btn">
-                    <svg className="w-8 h-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="text-xs text-gray-500">Kamera</span>
-                  </button>
-                </div>
-              )}
-              <input ref={fileInputRef} type="file" accept="image/*" className="is-hidden" onChange={handleImageUpload} />
-              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="is-hidden" onChange={handleImageUpload} />
-            </div>
-
-            {/* Message */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Pesan (opsional)</label>
-              <textarea
-                placeholder="Tulis pesan tambahan..."
-                value={confirmMessage}
-                onChange={(e) => setConfirmMessage(e.target.value)}
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none"
-              />
-            </div>
-
-            {/* Submit */}
-            <button
-              onClick={submitConfirmation}
-              disabled={confirmSending || !confirmPhone}
-              className="w-full py-4 gradient-btn text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {confirmSending ? (
-                <>
-                  <div className="loading-spinner" />
-                  <span className="btn-text">Mengirim...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                  Kirim Konfirmasi
-                </>
-              )}
-            </button>
-          </div>
+  <!-- Package Categories -->
+  <main class="flex-1 px-3 sm:px-4 pb-8">
+    <div class="container mx-auto">
+      
+      <!-- Install App Banner -->
+      <div id="installBanner" class="install-banner" onclick="openInstallAppModal()">
+        <div class="install-banner-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
         </div>
-
-        {/* History Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showHistory ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => { setShowHistory(false); setHistorySearched(false) }} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Riwayat Pesanan
-            </h2>
-            <div className="flex gap-2 mb-4">
-              <input
-                type="tel"
-                placeholder="Cari nomor WhatsApp..."
-                value={historyPhone}
-                onChange={(e) => setHistoryPhone(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && searchHistory()}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-              />
-              <button onClick={searchHistory} className="px-4 py-3 gradient-btn text-white rounded-xl font-medium text-sm">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
-            {historySearched && (
-              <div>
-                {historyOrders.length === 0 ? (
-                  <div className="text-center py-12">
-                    <svg className="w-16 h-16 mx-auto text-gray-200 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p className="text-gray-400 text-sm">Belum ada riwayat pesanan</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {historyOrders.map((order) => (
-                      <div key={order.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-mono font-bold text-gray-700">{order.id}</span>
-                          <div className="flex items-center gap-1">
-                            {order.confirmed ? (
-                              <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">✅ Dikonfirmasi</span>
-                            ) : (
-                              <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">⏳ Menunggu</span>
-                            )}
-                            <button onClick={() => copyOrderId(order.id)} className="p-1">
-                              {copiedId === order.id ? (
-                                <svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                              ) : (
-                                <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                        <p className="text-[10px] text-gray-400 mb-2">{formatDateTime(order.timestamp)}</p>
-                        <div className="space-y-1">
-                          {order.items.map((item, i) => (
-                            <p key={i} className="text-xs text-gray-600">
-                              {item.qty}x {item.paket.nama} = {formatRupiah(item.paket.harga * item.qty)}
-                            </p>
-                          ))}
-                        </div>
-                        <div className="border-t border-gray-200 mt-2 pt-2">
-                          <p className="text-sm font-bold text-emerald-600">Total: {formatRupiah(order.total)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+        <div class="flex-1">
+          <p class="font-bold text-sm">📱 Install Aplikasi DOTOPUP</p>
+          <p class="text-xs opacity-90">Dapatkan notifikasi & akses lebih cepat!</p>
         </div>
-
-        {/* Cara Order Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showCaraOrder ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => setShowCaraOrder(false)} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      </div>
+      
+      <div class="mb-4 flex flex-wrap gap-2 justify-center">
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">🔹 Paket Cepat</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">🔹 Paket Harian</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">🔹 Paket Mingguan</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">🏠 Paket Internet Rumah</span>
+      </div>
+      
+      <div id="packageGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"></div>
+      
+      <!-- Confirm Order Section -->
+      <div class="confirm-order-section">
+        <div id="confirmOrderBtn" class="confirm-order-card" onclick="openConfirmOrderModal()">
+          <div class="icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">📋 Cara Order</h2>
-            <div className="space-y-4">
-              {[
-                { step: '1', title: 'Pilih Paket', desc: 'Pilih paket WiFi sesuai kebutuhan Anda. Tersedia paket mulai dari 2 Jam hingga 1 Bulan.' },
-                { step: '2', title: 'Tambah ke Keranjang', desc: 'Klik tombol + Tambah untuk menambahkan paket ke keranjang. Anda bisa menambah beberapa paket sekaligus.' },
-                { step: '3', title: 'Checkout', desc: 'Klik "Konfirmasi Pesanan" dan masukkan nomor WhatsApp Anda.' },
-                { step: '4', title: 'Bayar via QRIS', desc: 'Scan kode QRIS untuk membayar. Bisa pakai GoPay, OVO, Dana, ShopeePay, dll.' },
-                { step: '5', title: 'Upload Bukti', desc: 'Upload bukti pembayaran Anda. Voucher WiFi akan dikirim via WhatsApp.' },
-              ].map((item) => (
-                <div key={item.step} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full gradient-btn text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                    {item.step}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-800">{item.title}</h4>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Kritik & Saran Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showKritik ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => setShowKritik(false)} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">💬 Kritik &amp; Saran</h2>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Kami selalu berusaha memberikan layanan terbaik. Jika Anda memiliki kritik, saran, atau masukan, silakan sampaikan melalui:
-            </p>
-            <a
-              href={`https://wa.me/${CONFIG.noWhatsappAdmin}?text=Halo%20admin%2C%20saya%20ingin%20menyampaikan%20kritik%20%26%20saran%20tentang%20layanan%20WiFi.`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4 hover:bg-green-100 transition-colors"
-            >
-              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-green-700">WhatsApp Admin</p>
-                <p className="text-xs text-green-600">Klik untuk mengirim pesan</p>
-              </div>
-            </a>
-            <p className="text-xs text-gray-400 text-center mt-4">Terima kasih atas masukan Anda! 🙏</p>
-          </div>
-        </div>
-
-        {/* Info Offline Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showInfoOffline ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => setShowInfoOffline(false)} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">⚠️ Info Offline</h2>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-              <p className="text-sm font-semibold text-amber-800 mb-2">Saat Ini Online ✅</p>
-              <p className="text-xs text-amber-700 leading-relaxed">
-                Layanan WiFi CIWATIN saat ini sedang aktif dan beroperasi normal. Anda dapat melakukan pemesanan voucher WiFi kapan saja.
-              </p>
-            </div>
-            <div className="space-y-3">
-              <h4 className="text-sm font-bold text-gray-700">Jika Terjadi Gangguan:</h4>
-              <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
-                <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-xs text-gray-600">Hubungi admin via WhatsApp untuk melaporkan gangguan koneksi.</p>
-              </div>
-              <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
-                <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-xs text-gray-600">Gangguan biasanya ditangani dalam waktu maksimal 1x24 jam.</p>
-              </div>
-              <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
-                <svg className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <p className="text-xs text-gray-600">Voucher yang sudah dibeli akan otomatis diperpanjang jika ada gangguan.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Join Jualan Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showJoinJualan ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => setShowJoinJualan(false)} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">🤝 Join Jualan</h2>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Tertarik menjadi mitra penjual voucher WiFi CIWATIN? Dapatkan keuntungan menarik dengan sistem bagi hasil!
-            </p>
-            <div className="space-y-3 mb-4">
-              {[
-                { icon: '💰', title: 'Komisi Menarik', desc: 'Dapatkan komisi hingga 20% dari setiap penjualan.' },
-                { icon: '📱', title: 'Mudah Dijual', desc: 'Cukup bagikan link atau QR code ke calon pembeli.' },
-                { icon: '📊', title: 'Dashboard Real-time', desc: 'Pantau penjualan dan komisi Anda secara real-time.' },
-                { icon: '🎓', title: 'Panduan Lengkap', desc: 'Kami menyediakan panduan dan bimbingan untuk pemula.' },
-              ].map((item, i) => (
-                <div key={i} className="bg-gray-50 rounded-xl p-4 flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">{item.icon}</span>
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-800">{item.title}</h4>
-                    <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <a
-              href={`https://wa.me/${CONFIG.noWhatsappAdmin}?text=Halo%20admin%2C%20saya%20tertarik%20untuk%20bergabung%20menjadi%20mitra%20penjual%20WiFi.`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 gradient-btn text-white rounded-xl font-bold text-sm"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              Hubungi Admin
-            </a>
-          </div>
-        </div>
-
-        {/* Install App Panel */}
-        <div className={`absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto z-50 ${!showInstallApp ? 'is-hidden' : ''}`} style={{maxHeight: '100vh'}}>
-          <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
-            <button onClick={() => setShowInstallApp(false)} className="btn-back">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Kembali
-            </button>
-            <button onClick={closeAllModals} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">📲 Install Aplikasi</h2>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Install aplikasi WiFi CIWATIN di perangkat Anda untuk akses lebih cepat dan pengalaman yang lebih baik.
-            </p>
-            <div className="space-y-4 mb-4">
-              <div>
-                <h4 className="text-sm font-bold text-gray-700 mb-2">📱 Android (Chrome)</h4>
-                <ol className="text-xs text-gray-500 space-y-2 list-decimal list-inside">
-                  <li>Buka halaman ini di Chrome</li>
-                  <li>Klik menu titik tiga (⋮) di pojok kanan atas</li>
-                  <li>Pilih &quot;Add to Home screen&quot; atau &quot;Install app&quot;</li>
-                  <li>Klik &quot;Install&quot; untuk mengkonfirmasi</li>
-                </ol>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-gray-700 mb-2">🍎 iPhone (Safari)</h4>
-                <ol className="text-xs text-gray-500 space-y-2 list-decimal list-inside">
-                  <li>Buka halaman ini di Safari</li>
-                  <li>Klik tombol Share (📤) di bagian bawah</li>
-                  <li>Pilih &quot;Add to Home Screen&quot;</li>
-                  <li>Klik &quot;Add&quot; untuk mengkonfirmasi</li>
-                </ol>
-              </div>
-            </div>
-            {deferredPrompt && (
-              <button
-                onClick={async () => {
-                  try {
-                    await deferredPrompt.prompt()
-                    const result = await deferredPrompt.userChoice
-                    if (result.outcome === 'accepted') {
-                      toast('Aplikasi berhasil diinstall! 🎉')
-                      setShowInstallApp(false)
-                      setShowInstallBanner(false)
-                    }
-                    setDeferredPrompt(null)
-                  } catch (e) {
-                    console.error('Install error:', e)
-                  }
-                }}
-                className="w-full py-3.5 gradient-btn text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Install Sekarang
-              </button>
-            )}
+          <div class="text-content">
+            <p class="title">Konfirmasi Pesanan</p>
+            <p class="subtitle">Upload bukti pembayaran di sini</p>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  </main>
+
+  <!-- Floating Cart Button (Mobile) -->
+  <div id="floatingCart" class="fixed bottom-4 left-4 right-4 z-40 is-hidden sm:hidden">
+    <button id="btnFloatingCart" class="w-full gradient-btn text-white h-12 rounded-xl shadow-lg flex items-center justify-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <span>Lihat Keranjang (<span id="floatingCartCount">0</span>) - <span id="floatingCartTotal">Rp 0</span></span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-6 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-xl gradient-btn flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+        </div>
+        <span class="font-semibold" id="footerStoreName">WIFI CIWATIN</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3" id="footerAddress">Jl. Ciwatin Raya, Indonesia</p>
+      <div class="flex items-center justify-center gap-4 text-sm">
+        <a id="whatsappLink" href="#" target="_blank" rel="noopener" class="flex items-center gap-2 text-emerald-400 hover:text-emerald-300">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <span class="text-gray-600">|</span>
+        <a href="#" id="openConfirmFromFooter" onclick="event.preventDefault(); openConfirmOrderModal();" class="flex items-center gap-2 text-cyan-400 hover:text-cyan-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Konfirmasi
+        </a>
+      </div>
+      <p class="text-gray-500 text-xs mt-4" id="copyright"></p>
+      <p class="text-gray-600 text-xs mt-2">Design by Nursidik</p>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL KONFIRMASI PESANAN ==================== -->
+  <div id="confirmOrderModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" id="confirmOrderOverlay"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeConfirmOrderModal()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Kembali
+          </button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeConfirmOrderModal()">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full gradient-btn flex items-center justify-center shadow-lg">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">Konfirmasi Pesanan</h3>
+          <p class="text-sm text-gray-600 mt-1">Upload bukti pembayaran Anda</p>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">📱 Nomor WhatsApp</label>
+          <input type="tel" id="confirmPhone" placeholder="Contoh: 08123456789" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <p class="text-xs text-gray-500 mt-1">Voucher akan dikirim ke nomor ini</p>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">🆔 ID Pesanan (opsional)</label>
+          <input type="text" id="confirmOrderId" placeholder="Contoh: WFI-XXX" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+        </div>
+        
+        <div id="confirmOrderPreview" class="mb-4 is-hidden">
+          <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+            <p class="text-sm font-semibold text-emerald-700 mb-2">📦 Detail Pesanan Ditemukan:</p>
+            <div id="confirmOrderPreviewContent" class="text-sm text-gray-700 space-y-1"></div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">📷 Bukti Pembayaran</label>
+          <div class="flex gap-2">
+            <label class="upload-method-btn flex-1">
+              <input type="file" id="confirmImageInput" accept="image/*" class="is-hidden">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span class="text-xs mt-1">Galeri</span>
+            </label>
+            <label class="upload-method-btn flex-1">
+              <input type="file" id="confirmCameraInput" accept="image/*" capture="environment" class="is-hidden">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span class="text-xs mt-1">Kamera</span>
+            </label>
+          </div>
+          <div id="confirmImagePreviewContainer" class="is-hidden mt-3 p-2 bg-gray-50 rounded-lg">
+            <img id="confirmImagePreview" class="image-preview mx-auto" alt="Preview">
+            <button id="confirmRemoveImage" class="w-full mt-2 text-red-500 text-xs hover:underline flex items-center justify-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              Hapus Gambar
+            </button>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">💬 Pesan (opsional)</label>
+          <textarea id="confirmMessage" rows="2" placeholder="Tambahkan pesan..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"></textarea>
+        </div>
+        
+        <button id="btnSubmitConfirm" class="w-full gradient-btn text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition">
+          <span class="btn-text">
+            <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            Kirim Konfirmasi
+          </span>
+          <span class="btn-spinner is-hidden"><div class="loading-spinner"></div></span>
+        </button>
+        
+        <p class="text-xs text-gray-500 text-center mt-3">Konfirmasi akan dikirim via Telegram ke admin</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL CARA ORDER ==================== -->
+  <div id="caraOrderModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeCaraOrderModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeCaraOrderModal()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeCaraOrderModal()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">📋 Cara Order Paket</h3>
+        <div class="space-y-4">
+          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">1</div><div><h4 class="font-semibold">Pilih Paket</h4><p class="text-sm text-gray-600">Pilih paket WiFi sesuai kebutuhan dan masukkan ke keranjang</p></div></div>
+          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">2</div><div><h4 class="font-semibold">Checkout</h4><p class="text-sm text-gray-600">Masukkan nomor WhatsApp aktif untuk menerima voucher</p></div></div>
+          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">3</div><div><h4 class="font-semibold">Bayar via QRIS</h4><p class="text-sm text-gray-600">Scan QRIS dan transfer sesuai nominal</p></div></div>
+          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">4</div><div><h4 class="font-semibold">Upload Bukti</h4><p class="text-sm text-gray-600">Upload bukti pembayaran di live chat</p></div></div>
+          <div class="flex gap-3"><div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold flex-shrink-0">5</div><div><h4 class="font-semibold">Terima Voucher</h4><p class="text-sm text-gray-600">Kode voucher dikirim ke WhatsApp Anda</p></div></div>
+        </div>
+        <div class="mt-6 p-3 bg-emerald-50 rounded-lg"><p class="text-sm text-emerald-700">💡 <strong>Tips:</strong> Pastikan nomor WhatsApp yang dimasukkan aktif untuk menerima kode voucher dengan cepat!</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL KRITIK SARAN ==================== -->
+  <div id="kritikSaranModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeKritikSaranModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeKritikSaranModal()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeKritikSaranModal()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">💬 Kritik & Saran</h3>
+        <p class="text-sm text-gray-600 mb-4">Kritik dan saran Anda sangat berharga untuk meningkatkan layanan kami.</p>
+        <button onclick="closeKritikSaranModal(); openConfirmOrderModal();" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+          Kirim via Konfirmasi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL INFO OFFLINE ==================== -->
+  <div id="infoOfflineModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeInfoOfflineModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeInfoOfflineModal()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeInfoOfflineModal()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">📍 Info Pembelian Offline</h3>
+        <div class="bg-orange-50 rounded-lg p-4 mb-4">
+          <p class="text-orange-800 font-medium">🏠 Untuk pembelian voucher offline hanya ada di:</p>
+          <p class="text-orange-700 text-lg font-bold mt-2">Rumah Ipin dan Rani</p>
+        </div>
+        <p class="text-sm text-gray-600">Silakan kunjungi lokasi tersebut untuk pembelian langsung tanpa perlu order online.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL JOIN JUALAN ==================== -->
+  <div id="joinJualanModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeJoinJualanModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeJoinJualanModal()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeJoinJualanModal()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">💰 Join Jualan Voucher</h3>
+        <div class="bg-green-50 rounded-lg p-4 mb-4">
+          <p class="text-green-800">🎉 <strong>Harapan yang belum menikmati internet cepat dotopup silahkan chat admin join jualan voucher yuk!</strong></p>
+        </div>
+        <p class="text-sm text-gray-600 mb-4">Dapatkan penghasilan tambahan dengan menjadi agen voucher WiFi DOTOPUP.</p>
+        <button onclick="window.open('https://wa.me/' + CONFIG.noWhatsappAdmin + '?text=' + encodeURIComponent('Saya tertarik untuk join jualan voucher WiFi DOTOPUP. Mohon info lebih lanjut.'), '_blank');" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+          Chat Admin untuk Join
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL INSTALL APP ==================== -->
+  <div id="installAppModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeInstallAppModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeInstallAppModal()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeInstallAppModal()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div class="text-center mb-6">
+          <div class="w-20 h-20 mx-auto mb-4 rounded-2xl gradient-btn flex items-center justify-center shadow-lg">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">📱 Install DOTOPUP</h3>
+          <p class="text-sm text-gray-600 mt-2">Pasang aplikasi di HP Anda untuk akses lebih cepat!</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4">
+          <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Cara Manual Install
+          </h4>
+          <div class="mb-4">
+            <p class="text-sm font-medium text-gray-700 mb-2">📱 Android (Chrome):</p>
+            <ol class="text-sm text-gray-600 space-y-1 ml-4 list-decimal"><li>Ketuk titik tiga (⋮) di pojok kanan atas</li><li>Pilih <strong>"Add to Home screen"</strong></li><li>Ketuk <strong>"Install"</strong></li></ol>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-700 mb-2">🍎 iPhone/iPad (Safari):</p>
+            <ol class="text-sm text-gray-600 space-y-1 ml-4 list-decimal"><li>Ketuk tombol Share <strong>(↑)</strong></li><li>Pilih <strong>"Add to Home Screen"</strong></li><li>Ketuk <strong>"Add"</strong></li></ol>
+          </div>
+        </div>
+        <div class="mt-4 p-3 bg-emerald-50 rounded-lg">
+          <p class="text-xs text-emerald-700 text-center"><strong>✨ Keuntungan Install:</strong><br>Akses 1 klik dari home screen • Notifikasi pesanan • Tanpa browser</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL KERANJANG ==================== -->
+  <div id="cartModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeCartModal()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeCartModal()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeCartModal()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <h3 class="text-lg font-bold flex items-center gap-2 mb-4">🛒 Keranjang Belanja</h3>
+        <p id="cartDescription" class="text-sm text-gray-500 mb-4">0 item dalam keranjang</p>
+        <div id="cartItems" class="space-y-3 mb-4 max-h-64 overflow-y-auto"></div>
+        <div id="cartEmpty" class="py-8 text-center text-gray-500 is-hidden"><p>Keranjang masih kosong</p><p class="text-sm">Tambahkan paket untuk melanjutkan</p></div>
+        <div id="cartSummary" class="border-t pt-4 space-y-3">
+          <div class="flex justify-between items-center"><span class="font-semibold">Total</span><span id="cartTotal" class="text-xl font-bold text-emerald-600">Rp 0</span></div>
+          <div class="flex gap-2">
+            <button id="btnClearCart" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition">Hapus</button>
+            <button id="btnCheckout" class="flex-1 gradient-btn text-white px-4 py-2 rounded-lg transition">Checkout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL CHECKOUT ==================== -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeCheckoutModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" id="btnBackCheckout"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeCheckoutModal()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <h3 id="checkoutTitle" class="text-lg font-bold mb-4">Checkout</h3>
+        <p id="checkoutDescription" class="text-sm text-gray-500 mb-4">0 item - Total: Rp 0</p>
+        
+        <!-- Step 1 -->
+        <div id="checkoutStep1" class="space-y-4">
+          <div id="orderSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 max-h-32 overflow-y-auto text-sm"></div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Nomor WhatsApp / Telepon</label>
+            <input type="tel" id="inputWhatsapp" placeholder="Contoh: 08123456789" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <p class="text-xs text-gray-500 mt-1">Untuk menerima kode voucher</p>
+          </div>
+          <button id="btnSubmitCheckout" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2">💳 Lanjut ke Pembayaran</button>
+        </div>
+        
+        <!-- Step 2 -->
+        <div id="checkoutStep2" class="space-y-4 is-hidden">
+          <div class="bg-blue-50 rounded-lg p-3 flex items-center justify-between">
+            <div><p class="text-xs text-gray-500">ID Pesanan</p><p id="orderIdDisplay" class="font-mono font-semibold text-sm">WFI-XXX</p></div>
+            <button id="btnCopyOrderId" class="p-2 hover:bg-blue-100 rounded-lg">📋</button>
+          </div>
+          <div id="qrisInfo" class="text-center"></div>
+          <div class="flex justify-center">
+            <div class="bg-white p-3 rounded-xl shadow-lg border">
+              <img id="qrisImage" src="" alt="QRIS Payment" class="w-56 h-56 sm:w-64 sm:h-64 object-contain" onerror="this.classList.add('is-hidden'); document.getElementById('qrisError').classList.remove('is-hidden');">
+            </div>
+          </div>
+          <div id="qrisError" class="is-hidden bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p class="text-red-700 text-sm">⚠️ Gagal memuat QRIS. <button onclick="retryQris()" class="underline text-blue-600">Coba lagi</button></p>
+          </div>
+          <div class="text-center"><p class="text-lg font-bold text-emerald-600">Transfer: <span id="paymentTotal">Rp 0</span></p></div>
+          <button id="btnConfirmPayment" class="w-full gradient-btn text-white py-3 rounded-lg transition flex items-center justify-center gap-2 pulse-glow">
+            <span class="btn-text">✅ Saya Sudah Bayar</span>
+            <span class="btn-spinner is-hidden"><div class="loading-spinner"></div></span>
+          </button>
+          <div id="paymentProgressContainer" class="is-hidden">
+            <p id="paymentProgressText" class="text-center text-sm text-gray-600 mb-1">Memproses pembayaran...</p>
+            <div class="progress-bar-container"><div id="paymentProgressBar" class="progress-bar"></div></div>
+          </div>
+        </div>
+        
+        <!-- Step 3 -->
+        <div id="checkoutStep3" class="space-y-4 is-hidden">
+          <div class="bg-green-50 rounded-lg p-4 text-center"><p class="text-2xl mb-2">✅</p><p class="font-semibold text-green-700">Pembayaran Dikonfirmasi!</p><p class="text-sm text-gray-600 mt-1">Upload bukti pembayaran untuk mendapatkan kode voucher</p></div>
+          <div id="finalOrderSummary" class="bg-gray-50 rounded-lg p-3 space-y-2 text-sm"></div>
+          <button onclick="closeCheckoutModal(); openConfirmOrderModal();" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            📷 Upload Bukti Pembayaran
+          </button>
+          <p class="text-xs text-center text-gray-500">Kode voucher akan dikirim ke WhatsApp setelah verifikasi</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL HISTORY ==================== -->
+  <div id="historyModal" class="fixed inset-0 z-50 is-hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeHistoryModal()"></div>
+    <div class="absolute inset-0 sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-96 bg-white shadow-xl slide-up overflow-y-auto">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <button class="btn-back" onclick="closeHistoryModal()"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Kembali</button>
+          <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="closeHistoryModal()">✕</button>
+        </div>
+        <h3 class="text-lg font-bold mb-4">📋 Riwayat Pesanan</h3>
+        <p class="text-sm text-gray-500 mb-4">Masukkan nomor WhatsApp untuk melihat pesanan</p>
+        <div class="flex gap-2 mb-4">
+          <input type="tel" id="historyPhone" placeholder="Nomor WhatsApp (08xxx)" class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <button id="btnLoadHistory" class="px-4 py-2 gradient-btn text-white rounded-lg">Cari</button>
+        </div>
+        <div id="historyList" class="space-y-3 max-h-96 overflow-y-auto"></div>
+        <div id="historyEmpty" class="py-8 text-center text-gray-500"><p>Masukkan nomor WhatsApp untuk melihat pesanan</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-20 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 z-[1100]">
+    <p id="toastMessage">Message</p>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    let cart = [];
+    let currentOrder = null;
+    let currentCheckoutStep = 1;
+    let confirmImageBase64 = null;
+
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    }
+
+    function generateOrderId() {
+      return 'WFI-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    }
+
+    function getStorageKey(phone) { return 'wifi_orders_' + phone.replace(/\D/g, ''); }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = message;
+      toast.classList.remove('translate-y-full', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-full', 'opacity-0'), 3000);
+    }
+
+    function formatDate(ts) {
+      return new Date(ts).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatDateLong(ts) {
+      return new Date(ts).toLocaleString('id-ID', { 
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+      });
+    }
+
+    function cleanExpiredOrders(phone) {
+      try {
+        const stored = localStorage.getItem(getStorageKey(phone));
+        if (!stored) return [];
+        const orders = JSON.parse(stored);
+        return orders.filter(o => o.expiresAt > Date.now());
+      } catch { return []; }
+    }
+
+    function safeLocalStorage(action, key, value) {
+      try {
+        if (action === 'get') { const item = localStorage.getItem(key); return item ? JSON.parse(item) : null; }
+        else if (action === 'set') { localStorage.setItem(key, JSON.stringify(value)); return true; }
+      } catch { return null; }
+    }
+
+    // =============================================
+    // KIRIM VIA CLOUDFLARE WORKER (FIX CORS!)
+    // =============================================
+    async function sendTelegramMessage(message, imageBase64) {
+      try {
+        const body = { message };
+        if (imageBase64) body.imageBase64 = imageBase64;
+        
+        const res = await fetch(CONFIG.workerUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        return await res.json();
+      } catch (e) { 
+        return { ok: false, error: e.message }; 
+      }
+    }
+
+    // ========== MODAL FUNCTIONS ==========
+    function showConfirmBtn() { document.getElementById('confirmOrderBtn')?.classList.remove('is-hidden'); }
+    function hideConfirmBtn() { document.getElementById('confirmOrderBtn')?.classList.add('is-hidden'); }
+
+    function openCaraOrderModal() { document.getElementById('caraOrderModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeCaraOrderModal() { document.getElementById('caraOrderModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
+    
+    function openKritikSaranModal() { document.getElementById('kritikSaranModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeKritikSaranModal() { document.getElementById('kritikSaranModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
+    
+    function openInfoOfflineModal() { document.getElementById('infoOfflineModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeInfoOfflineModal() { document.getElementById('infoOfflineModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
+    
+    function openJoinJualanModal() { document.getElementById('joinJualanModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeJoinJualanModal() { document.getElementById('joinJualanModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
+    
+    function openInstallAppModal() { document.getElementById('installAppModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeInstallAppModal() { document.getElementById('installAppModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
+    
+    function openCartModal() { document.getElementById('cartModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; renderCartItems(); hideConfirmBtn(); }
+    function closeCartModal() { document.getElementById('cartModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
+    
+    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; hideConfirmBtn(); }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('is-hidden'); document.body.style.overflow = ''; currentCheckoutStep = 1; showCheckoutStep(1); showConfirmBtn(); }
+    
+    function openHistoryModal() { document.getElementById('historyModal').classList.remove('is-hidden'); document.body.style.overflow = 'hidden'; document.getElementById('historyList').innerHTML = ''; hideConfirmBtn(); }
+    function closeHistoryModal() { document.getElementById('historyModal').classList.add('is-hidden'); document.body.style.overflow = ''; showConfirmBtn(); }
+
+    // ========== RENDER PACKAGES ==========
+    function renderPackages() {
+      const grid = document.getElementById('packageGrid');
+      grid.innerHTML = CONFIG.paket.map((p) => {
+        let badgeHtml = p.bestSeller ? '<div class="best-value-badge" title="Paling Laris">⭐</div>' : '';
+        let categoryStyle = '';
+        if (p.kategori === 'rumah') categoryStyle = 'bg-gradient-to-b from-orange-50 to-white';
+        else if (p.kategori === 'mingguan') categoryStyle = 'bg-gradient-to-b from-purple-50 to-white';
+        
+        return `
+        <div class="relative overflow-hidden border-2 border-transparent card-hover rounded-xl bg-white transition-all duration-300 group ${categoryStyle}">
+          ${badgeHtml}
+          <div class="p-3 sm:p-4">
+            <div class="flex items-center gap-2 sm:gap-3 mb-3">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-btn flex items-center justify-center shadow group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-base leading-tight">${p.nama}</h3>
+                <p class="text-xs text-gray-500">⚡ ${p.kecepatan}</p>
+              </div>
+            </div>
+            <div class="text-center mb-3">
+              <p class="text-xl sm:text-2xl font-bold text-emerald-600">${formatRupiah(p.harga)}</p>
+              <p class="text-xs sm:text-sm text-gray-500">${p.durasi}</p>
+            </div>
+            <button data-paket-id="${p.id}" class="btn-add-cart w-full gradient-btn text-white py-2 rounded-lg text-sm flex items-center justify-center gap-1 transition">+ Tambah</button>
+          </div>
+        </div>`;
+      }).join('');
+      
+      grid.querySelectorAll('.btn-add-cart').forEach(btn => {
+        btn.addEventListener('click', function() { addToCart(this.dataset.paketId); });
+      });
+    }
+
+    function addToCart(id) {
+      const paket = CONFIG.paket.find(p => p.id === id);
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.quantity++;
+      else cart.push({ ...paket, quantity: 1 });
+      saveCart();
+      updateCartUI();
+      showToast(paket.nama + ' ditambahkan');
+    }
+
+    function removeFromCart(id) { cart = cart.filter(i => i.id !== id); saveCart(); updateCartUI(); renderCartItems(); }
+    
+    function updateQuantity(id, d) {
+      const item = cart.find(i => i.id === id);
+      if (item) {
+        item.quantity += d;
+        if (item.quantity <= 0) { removeFromCart(id); return; }
+        saveCart(); updateCartUI(); renderCartItems();
+      }
+    }
+    
+    function clearCart() { cart = []; saveCart(); updateCartUI(); renderCartItems(); showToast('Keranjang dikosongkan'); }
+    function saveCart() { safeLocalStorage('set', 'wifi_cart', cart); }
+
+    function updateCartUI() {
+      let count = 0, total = 0;
+      cart.forEach(i => { count += i.quantity; total += i.harga * i.quantity; });
+      const badge = document.getElementById('cartBadge');
+      if (count > 0) { badge.textContent = count; badge.classList.remove('is-hidden'); }
+      else badge.classList.add('is-hidden');
+      
+      const floating = document.getElementById('floatingCart');
+      if (count > 0) {
+        floating.classList.remove('is-hidden');
+        document.getElementById('floatingCartCount').textContent = count;
+        document.getElementById('floatingCartTotal').textContent = formatRupiah(total);
+      } else floating.classList.add('is-hidden');
+      
+      document.getElementById('cartDescription').textContent = count > 0 ? count + ' item' : 'Keranjang kosong';
+      document.getElementById('cartTotal').textContent = formatRupiah(total);
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cartItems');
+      if (cart.length === 0) {
+        container.innerHTML = '';
+        document.getElementById('cartEmpty').classList.remove('is-hidden');
+        document.getElementById('cartSummary').classList.add('is-hidden');
+        return;
+      }
+      document.getElementById('cartEmpty').classList.add('is-hidden');
+      document.getElementById('cartSummary').classList.remove('is-hidden');
+      
+      container.innerHTML = cart.map(item => `
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <div class="flex-1 min-w-0"><p class="font-medium text-sm truncate">${item.nama}</p><p class="text-xs text-gray-500">${formatRupiah(item.harga)}</p></div>
+          <div class="flex items-center gap-1">
+            <button data-id="${item.id}" data-d="-1" class="btn-qty w-7 h-7 border rounded hover:bg-gray-100">−</button>
+            <span class="w-8 text-center text-sm">${item.quantity}</span>
+            <button data-id="${item.id}" data-d="1" class="btn-qty w-7 h-7 border rounded hover:bg-gray-100">+</button>
+          </div>
+          <button data-id="${item.id}" class="btn-rm w-8 h-8 text-red-500 hover:bg-red-50 rounded">🗑</button>
+        </div>
+      `).join('');
+      
+      container.querySelectorAll('.btn-qty').forEach(b => b.addEventListener('click', function() { updateQuantity(this.dataset.id, parseInt(this.dataset.d)); }));
+      container.querySelectorAll('.btn-rm').forEach(b => b.addEventListener('click', function() { removeFromCart(this.dataset.id); }));
+    }
+
+    function proceedToCheckout() {
+      if (cart.length === 0) { showToast('Keranjang kosong'); return; }
+      closeCartModal(); openCheckoutModal(); currentCheckoutStep = 1; showCheckoutStep(1);
+      let count = 0, total = 0;
+      cart.forEach(i => { count += i.quantity; total += i.harga * i.quantity; });
+      document.getElementById('checkoutDescription').textContent = count + ' item - ' + formatRupiah(total);
+      document.getElementById('orderSummary').innerHTML = cart.map(i => `<div class="flex justify-between"><span>${i.nama} x${i.quantity}</span><span>${formatRupiah(i.harga * i.quantity)}</span></div>`).join('') + `<div class="border-t pt-2 mt-2 flex justify-between font-semibold"><span>Total</span><span class="text-emerald-600">${formatRupiah(total)}</span></div>`;
+    }
+
+    function showCheckoutStep(s) {
+      currentCheckoutStep = s;
+      document.getElementById('checkoutStep1').classList.toggle('is-hidden', s !== 1);
+      document.getElementById('checkoutStep2').classList.toggle('is-hidden', s !== 2);
+      document.getElementById('checkoutStep3').classList.toggle('is-hidden', s !== 3);
+      document.getElementById('checkoutTitle').textContent = ['Checkout', 'Pembayaran QRIS', 'Upload Bukti'][s - 1];
+    }
+
+    function submitCheckout() {
+      const wa = document.getElementById('inputWhatsapp').value.trim();
+      if (!wa) { showToast('Masukkan nomor WhatsApp'); return; }
+      const clean = wa.replace(/\D/g, '');
+      if (clean.length < 10) { showToast('Nomor tidak valid'); return; }
+      
+      const formatted = clean.startsWith('0') ? '62' + clean.slice(1) : clean;
+      let total = 0;
+      const items = cart.map(i => { total += i.harga * i.quantity; return { paketId: i.id, nama: i.nama, harga: i.harga, durasi: i.durasi, kecepatan: i.kecepatan, quantity: i.quantity }; });
+      
+      currentOrder = { id: generateOrderId(), items, total, noWhatsapp: formatted, status: 'pending', createdAt: Date.now(), expiresAt: Date.now() + 2*24*60*60*1000 };
+      
+      const key = getStorageKey(formatted);
+      const orders = cleanExpiredOrders(formatted);
+      orders.unshift(currentOrder);
+      safeLocalStorage('set', key, orders);
+      
+      currentCheckoutStep = 2; showCheckoutStep(2);
+      document.getElementById('orderIdDisplay').textContent = currentOrder.id;
+      document.getElementById('paymentTotal').textContent = formatRupiah(total);
+      
+      let qrisSrc = CONFIG.qrisDinamis;
+      if (currentOrder.items.length === 1) {
+        const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
+        const harga = paket?.harga;
+        if (CONFIG.qrisImages[harga]) qrisSrc = CONFIG.qrisImages[harga];
+      }
+      document.getElementById('qrisImage').src = qrisSrc;
+      document.getElementById('qrisInfo').innerHTML = currentOrder.items.length === 1 
+        ? '<span class="inline-block bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded mb-2">✓ QRIS Sesuai Nominal</span>'
+        : `<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800"><strong>QRIS Dinamis:</strong> Masukkan nominal <strong>${formatRupiah(total)}</strong></div>`;
+      document.getElementById('qrisError').classList.add('is-hidden');
+      document.getElementById('qrisImage').classList.remove('is-hidden');
+    }
+
+    function retryQris() {
+      let qrisSrc = CONFIG.qrisDinamis;
+      if (currentOrder && currentOrder.items.length === 1) {
+        const paket = CONFIG.paket.find(p => p.id === currentOrder.items[0]?.paketId);
+        if (CONFIG.qrisImages[paket?.harga]) qrisSrc = CONFIG.qrisImages[paket.harga];
+      }
+      const img = document.getElementById('qrisImage');
+      img.src = qrisSrc + (qrisSrc.includes('?') ? '&' : '?') + 't=' + Date.now();
+      img.classList.remove('is-hidden');
+      document.getElementById('qrisError').classList.add('is-hidden');
+    }
+
+    function copyOrderId() {
+      if (!currentOrder) return;
+      navigator.clipboard.writeText(currentOrder.id);
+      showToast('ID disalin');
+    }
+
+    function confirmPayment() {
+      if (!currentOrder) return;
+      const btn = document.getElementById('btnConfirmPayment');
+      const progressContainer = document.getElementById('paymentProgressContainer');
+      const progressText = document.getElementById('paymentProgressText');
+      
+      btn.classList.add('btn-loading'); btn.querySelector('.btn-text').classList.add('is-hidden'); btn.querySelector('.btn-spinner').classList.remove('is-hidden');
+      progressContainer.classList.remove('is-hidden');
+      
+      let secondsLeft = 5;
+      progressText.textContent = `Memverifikasi pembayaran... ${secondsLeft} detik`;
+      const countdownInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) progressText.textContent = `Memverifikasi pembayaran... ${secondsLeft} detik`;
+        else clearInterval(countdownInterval);
+      }, 1000);
+      
+      setTimeout(() => {
+        const key = getStorageKey(currentOrder.noWhatsapp);
+        const orders = cleanExpiredOrders(currentOrder.noWhatsapp);
+        orders.forEach(o => { if (o.id === currentOrder.id) o.status = 'paid'; });
+        safeLocalStorage('set', key, orders);
+        currentOrder.status = 'paid';
+        currentCheckoutStep = 3; showCheckoutStep(3);
+        
+        document.getElementById('finalOrderSummary').innerHTML = `
+          <div class="flex justify-between"><span class="text-gray-500">ID Pesanan</span><span class="font-mono font-semibold">${currentOrder.id}</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Item</span><span>${currentOrder.items.length} paket</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-semibold text-emerald-600">${formatRupiah(currentOrder.total)}</span></div>
+        `;
+        
+        btn.classList.remove('btn-loading'); btn.querySelector('.btn-text').classList.remove('is-hidden'); btn.querySelector('.btn-spinner').classList.add('is-hidden');
+        progressContainer.classList.add('is-hidden');
+        cart = []; saveCart(); updateCartUI();
+        showToast('✅ Pembayaran berhasil dikonfirmasi!');
+      }, 5000);
+    }
+
+    function loadHistory() {
+      const phone = document.getElementById('historyPhone').value.trim().replace(/\D/g, '');
+      if (phone.length < 10) { showToast('Nomor tidak valid'); return; }
+      const formatted = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
+      const orders = cleanExpiredOrders(formatted);
+      const container = document.getElementById('historyList');
+      if (orders.length === 0) { container.innerHTML = ''; showToast('Tidak ada pesanan'); return; }
+      container.innerHTML = orders.map(o => `
+        <div class="border rounded-lg p-3 space-y-2">
+          <div class="flex justify-between"><span class="font-mono text-sm font-semibold">${o.id}</span>
+            <span class="${o.status === 'pending' ? 'bg-gray-100 text-gray-700' : o.status === 'paid' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'} text-xs px-2 py-1 rounded">${o.status === 'pending' ? 'Menunggu' : o.status === 'paid' ? 'Dibayar' : 'Selesai'}</span></div>
+          <p class="text-xs text-gray-500">${formatDate(o.createdAt)}</p>
+          <div class="border-t pt-2 flex justify-between font-semibold"><span>Total</span><span class="text-emerald-600">${formatRupiah(o.total)}</span></div>
+        </div>
+      `).join('');
+    }
+
+    // ========== KONFIRMASI PESANAN ==========
+    function openConfirmOrderModal() {
+      document.getElementById('confirmOrderModal').classList.remove('is-hidden');
+      document.body.style.overflow = 'hidden'; hideConfirmBtn();
+      
+      if (currentOrder) {
+        document.getElementById('confirmOrderId').value = currentOrder.id;
+        if (currentOrder.noWhatsapp) {
+          const phone = currentOrder.noWhatsapp.startsWith('62') ? '0' + currentOrder.noWhatsapp.slice(2) : currentOrder.noWhatsapp;
+          document.getElementById('confirmPhone').value = phone;
+        }
+      } else {
+        const savedUser = safeLocalStorage('get', 'wifi_chat_user');
+        if (savedUser?.phone) document.getElementById('confirmPhone').value = savedUser.phone;
+      }
+      
+      updateOrderPreview();
+    }
+    
+    function closeConfirmOrderModal() {
+      document.getElementById('confirmOrderModal').classList.add('is-hidden');
+      document.body.style.overflow = ''; showConfirmBtn();
+      document.getElementById('confirmOrderPreview').classList.add('is-hidden');
+    }
+    
+    function handleConfirmImageSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showToast('Pilih file gambar'); return; }
+      if (file.size > 5 * 1024 * 1024) { showToast('Maksimal 5MB'); return; }
+      
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        confirmImageBase64 = ev.target.result;
+        document.getElementById('confirmImagePreview').src = confirmImageBase64;
+        document.getElementById('confirmImagePreviewContainer').classList.remove('is-hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function removeConfirmImage() {
+      confirmImageBase64 = null;
+      document.getElementById('confirmImagePreviewContainer').classList.add('is-hidden');
+      document.getElementById('confirmImageInput').value = '';
+      document.getElementById('confirmCameraInput').value = '';
+    }
+    
+    function updateOrderPreview() {
+      const orderId = document.getElementById('confirmOrderId').value.trim();
+      const previewContainer = document.getElementById('confirmOrderPreview');
+      const previewContent = document.getElementById('confirmOrderPreviewContent');
+      
+      if (!orderId) { previewContainer.classList.add('is-hidden'); return; }
+      
+      const order = findOrderById(orderId);
+      if (order && order.items && order.items.length > 0) {
+        let html = '';
+        order.items.forEach((item, idx) => {
+          html += `<div class="flex justify-between"><span>${idx + 1}. ${item.nama} x${item.quantity}</span><span class="font-medium">${formatRupiah(item.harga * item.quantity)}</span></div>`;
+        });
+        html += `<div class="border-t border-emerald-300 pt-1 mt-1 flex justify-between font-bold text-emerald-700"><span>Total</span><span>${formatRupiah(order.total)}</span></div>`;
+        previewContent.innerHTML = html;
+        previewContainer.classList.remove('is-hidden');
+      } else { previewContainer.classList.add('is-hidden'); }
+    }
+    
+    function findOrderById(orderId) {
+      if (!orderId) return null;
+      if (currentOrder && currentOrder.id === orderId) return currentOrder;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('wifi_orders_')) {
+          try {
+            const orders = JSON.parse(localStorage.getItem(key));
+            if (Array.isArray(orders)) { const found = orders.find(o => o.id === orderId); if (found) return found; }
+          } catch (e) { continue; }
+        }
+      }
+      return null;
+    }
+    
+    function formatTelegramReceipt(order, phone, message) {
+      const msgTime = Date.now();
+      let receipt = `═══════════════════════════════\n        🛒 ${CONFIG.namaToko}\n═══════════════════════════════\n\n📥 KONFIRMASI PESANAN\n────────────────────────────────\n🆔 ID Pesanan: <code>${order?.id || 'Tidak ada ID'}</code>\n📱 No. WhatsApp: ${phone}\n🕐 Waktu: ${formatDateLong(msgTime)}\n\n`;
+      
+      if (order && order.items && order.items.length > 0) {
+        receipt += `┌──────────────────────────────┐\n│       📦 DETAIL PESANAN       │\n├──────────────────────────────┤\n`;
+        order.items.forEach((item, idx) => {
+          const subtotal = item.harga * item.quantity;
+          receipt += `│ <b>${idx + 1}. ${item.nama}</b>\n│    Durasi: ${item.durasi}\n│    ${item.kecepatan}\n│    ${item.quantity}x ${formatRupiah(item.harga)} = ${formatRupiah(subtotal)}\n`;
+          if (idx < order.items.length - 1) receipt += `│──────────────────────────────│\n`;
+        });
+        receipt += `├──────────────────────────────┤\n│ <b>TOTAL: ${formatRupiah(order.total)}</b>\n└──────────────────────────────┘\n`;
+      }
+      
+      if (message) receipt += `\n💬 <b>Pesan:</b>\n${message}\n`;
+      receipt += `\n────────────────────────────────\n📍 <b>${CONFIG.namaToko}</b>\n📍 ${CONFIG.alamat}\n═══════════════════════════════\n       Terima kasih! 🙏\n═══════════════════════════════`;
+      return receipt;
+    }
+
+    async function submitConfirmation() {
+      const phone = document.getElementById('confirmPhone').value.trim();
+      const orderId = document.getElementById('confirmOrderId').value.trim();
+      const message = document.getElementById('confirmMessage').value.trim();
+      
+      if (!phone) { showToast('Masukkan nomor WhatsApp'); return; }
+      if (phone.replace(/\D/g, '').length < 10) { showToast('Nomor tidak valid'); return; }
+      if (!confirmImageBase64) { showToast('Upload bukti pembayaran'); return; }
+      
+      safeLocalStorage('set', 'wifi_chat_user', { phone });
+      const orderData = findOrderById(orderId);
+      const telegramMessage = formatTelegramReceipt(orderData, phone, message);
+      
+      // Tampilkan loading
+      const btn = document.getElementById('btnSubmitConfirm');
+      btn.classList.add('btn-loading');
+      btn.querySelector('.btn-text').classList.add('is-hidden');
+      btn.querySelector('.btn-spinner').classList.remove('is-hidden');
+      showToast('Mengirim konfirmasi...');
+      
+      const result = await sendTelegramMessage(telegramMessage, confirmImageBase64);
+      
+      // Reset loading
+      btn.classList.remove('btn-loading');
+      btn.querySelector('.btn-text').classList.remove('is-hidden');
+      btn.querySelector('.btn-spinner').classList.add('is-hidden');
+      
+      if (result.ok) {
+        showToast('✅ Konfirmasi terkirim!');
+        closeConfirmOrderModal();
+        removeConfirmImage();
+        document.getElementById('confirmPhone').value = '';
+        document.getElementById('confirmOrderId').value = '';
+        document.getElementById('confirmMessage').value = '';
+      } else {
+        showToast('⚠️ Gagal mengirim: ' + (result.error || 'Coba lagi'));
+      }
+    }
+
+    function init() {
+      document.getElementById('storeName').textContent = CONFIG.namaToko;
+      document.getElementById('footerStoreName').textContent = CONFIG.namaToko;
+      document.getElementById('footerAddress').textContent = CONFIG.alamat;
+      document.getElementById('copyright').textContent = '© ' + new Date().getFullYear() + ' ' + CONFIG.namaToko;
+      document.getElementById('whatsappLink').href = 'https://wa.me/' + CONFIG.noWhatsappAdmin;
+      
+      const savedCart = safeLocalStorage('get', 'wifi_cart');
+      if (savedCart) cart = savedCart;
+      renderPackages();
+      updateCartUI();
+      setupEventListeners();
+    }
+
+    function setupEventListeners() {
+      document.getElementById('btnMenu').addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('dropdownMenu').classList.toggle('is-hidden');
+      });
+      document.addEventListener('click', () => document.getElementById('dropdownMenu').classList.add('is-hidden'));
+      
+      document.getElementById('menuCaraOrder').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openCaraOrderModal(); });
+      document.getElementById('menuKritikSaran').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openKritikSaranModal(); });
+      document.getElementById('menuInfoOffline').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openInfoOfflineModal(); });
+      document.getElementById('menuJoinJualan').addEventListener('click', () => { document.getElementById('dropdownMenu').classList.add('is-hidden'); openJoinJualanModal(); });
+      
+      document.getElementById('btnHistory').addEventListener('click', openHistoryModal);
+      document.getElementById('btnCart').addEventListener('click', openCartModal);
+      document.getElementById('btnFloatingCart').addEventListener('click', openCartModal);
+      document.getElementById('btnClearCart').addEventListener('click', clearCart);
+      document.getElementById('btnCheckout').addEventListener('click', proceedToCheckout);
+      
+      document.getElementById('btnBackCheckout').addEventListener('click', function() {
+        if (currentCheckoutStep > 1) { currentCheckoutStep--; showCheckoutStep(currentCheckoutStep); }
+        else { closeCheckoutModal(); openCartModal(); }
+      });
+      document.getElementById('btnSubmitCheckout').addEventListener('click', submitCheckout);
+      document.getElementById('btnCopyOrderId').addEventListener('click', copyOrderId);
+      document.getElementById('btnConfirmPayment').addEventListener('click', confirmPayment);
+      document.getElementById('btnLoadHistory').addEventListener('click', loadHistory);
+      
+      document.getElementById('confirmImageInput').addEventListener('change', handleConfirmImageSelect);
+      document.getElementById('confirmCameraInput').addEventListener('change', handleConfirmImageSelect);
+      document.getElementById('confirmRemoveImage').addEventListener('click', removeConfirmImage);
+      document.getElementById('btnSubmitConfirm').addEventListener('click', submitConfirmation);
+      document.getElementById('confirmOrderId').addEventListener('input', updateOrderPreview);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
