@@ -437,7 +437,19 @@
           </span>
           <span class="btn-spinner is-hidden"><div class="loading-spinner"></div></span>
         </button>
-        
+
+        <!-- Progress Upload Baru -->
+        <div id="uploadProgressContainer" class="is-hidden mt-4">
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-600">Mengupload bukti transaksi...</span>
+            <span id="uploadPercentText" class="font-semibold text-emerald-600">0%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div id="uploadProgressBar" class="h-full gradient-btn rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1 text-center">Jangan tutup halaman ini ya...</p>
+        </div>
+
         <p class="text-xs text-gray-500 text-center mt-3">Konfirmasi akan dikirim via Telegram ke admin</p>
       </div>
     </div>
@@ -948,42 +960,24 @@
       showToast('ID disalin');
     }
 
-    function confirmPayment() {
+        function confirmPayment() {
       if (!currentOrder) return;
-      const btn = document.getElementById('btnConfirmPayment');
-      const progressContainer = document.getElementById('paymentProgressContainer');
-      const progressText = document.getElementById('paymentProgressText');
       
-      btn.classList.add('btn-loading'); btn.querySelector('.btn-text').classList.add('is-hidden'); btn.querySelector('.btn-spinner').classList.remove('is-hidden');
-      progressContainer.classList.remove('is-hidden');
+      // Langsung pindah ke step 3 (Upload bukti) tanpa basa-basi loading 5 detik
+      currentCheckoutStep = 3; 
+      showCheckoutStep(3);
       
-      let secondsLeft = 5;
-      progressText.textContent = `Memverifikasi pembayaran... ${secondsLeft} detik`;
-      const countdownInterval = setInterval(() => {
-        secondsLeft--;
-        if (secondsLeft > 0) progressText.textContent = `Memverifikasi pembayaran... ${secondsLeft} detik`;
-        else clearInterval(countdownInterval);
-      }, 1000);
+      document.getElementById('finalOrderSummary').innerHTML = `
+        <div class="flex justify-between"><span class="text-gray-500">ID Pesanan</span><span class="font-mono font-semibold">${currentOrder.id}</span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Item</span><span>${currentOrder.items.length} paket</span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-semibold text-emerald-600">${formatRupiah(currentOrder.total)}</span></div>
+        <p class="text-xs text-red-500 mt-2 border-t pt-2">*Pastikan nominal transfer sesuai</p>
+      `;
       
-      setTimeout(() => {
-        const key = getStorageKey(currentOrder.noWhatsapp);
-        const orders = cleanExpiredOrders(currentOrder.noWhatsapp);
-        orders.forEach(o => { if (o.id === currentOrder.id) o.status = 'paid'; });
-        safeLocalStorage('set', key, orders);
-        currentOrder.status = 'paid';
-        currentCheckoutStep = 3; showCheckoutStep(3);
-        
-        document.getElementById('finalOrderSummary').innerHTML = `
-          <div class="flex justify-between"><span class="text-gray-500">ID Pesanan</span><span class="font-mono font-semibold">${currentOrder.id}</span></div>
-          <div class="flex justify-between"><span class="text-gray-500">Item</span><span>${currentOrder.items.length} paket</span></div>
-          <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-semibold text-emerald-600">${formatRupiah(currentOrder.total)}</span></div>
-        `;
-        
-        btn.classList.remove('btn-loading'); btn.querySelector('.btn-text').classList.remove('is-hidden'); btn.querySelector('.btn-spinner').classList.add('is-hidden');
-        progressContainer.classList.add('is-hidden');
-        cart = []; saveCart(); updateCartUI();
-        showToast('✅ Pembayaran berhasil dikonfirmasi!');
-      }, 5000);
+      // Kosongkan keranjang setelah diproses
+      cart = []; 
+      saveCart(); 
+      updateCartUI();
     }
 
     function loadHistory() {
@@ -1116,20 +1110,52 @@
       const orderData = findOrderById(orderId);
       const telegramMessage = formatTelegramReceipt(orderData, phone, message);
       
-      // Tampilkan loading
+      // 1. Sembunyikan tombol, munculkan Progress Bar
       const btn = document.getElementById('btnSubmitConfirm');
-      btn.classList.add('btn-loading');
-      btn.querySelector('.btn-text').classList.add('is-hidden');
-      btn.querySelector('.btn-spinner').classList.remove('is-hidden');
-      showToast('Mengirim konfirmasi...');
+      btn.classList.add('is-hidden');
+      const progressContainer = document.getElementById('uploadProgressContainer');
+      progressContainer.classList.remove('is-hidden');
       
+      const progressBar = document.getElementById('uploadProgressBar');
+      const percentText = document.getElementById('uploadPercentText');
+      let currentPercent = 0;
+
+      // 2. Jalankan Animasi Progress Bar (Naik pelan-pelan sampai 90%)
+      const progressInterval = setInterval(() => {
+        if (currentPercent < 60) {
+          currentPercent += Math.floor(Math.random() * 10) + 5;
+        } else if (currentPercent < 85) {
+          currentPercent += Math.floor(Math.random() * 5) + 1;
+        } else {
+          currentPercent += 1;
+        }
+        
+        if (currentPercent >= 90) currentPercent = 90; // MENTOK DI 90%
+        
+        progressBar.style.width = currentPercent + '%';
+        percentText.textContent = currentPercent + '%';
+      }, 300);
+
+      // 3. KIRIM DATA SEBENARNYA KE WORKER
       const result = await sendTelegramMessage(telegramMessage, confirmImageBase64);
       
-      // Reset loading
-      btn.classList.remove('btn-loading');
-      btn.querySelector('.btn-text').classList.remove('is-hidden');
-      btn.querySelector('.btn-spinner').classList.add('is-hidden');
+      // 4. SETELAH SELESAI (Berhasil / Gagal)
+      clearInterval(progressInterval); // Hentikan animasi
       
+      // Langsung loncat ke 100%
+      progressBar.style.width = '100%';
+      percentText.textContent = '100%';
+      
+      // Kasih jeda 0.5 detik biar user nyaman melihat 100%-nya
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Reset UI ke Semula
+      progressContainer.classList.add('is-hidden');
+      progressBar.style.width = '0%';
+      percentText.textContent = '0%';
+      btn.classList.remove('is-hidden');
+
+      // 5. TAMPILKAN HASILNYA
       if (result.ok) {
         showToast('✅ Konfirmasi terkirim!');
         closeConfirmOrderModal();
